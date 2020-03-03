@@ -2,7 +2,18 @@
 #ifndef CSTRING_H
 #define CSTRING_H
 
-#define CSTRING(initialSize) { initialSize }
+/* https://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
+ */
+#define CSTRING_OVERLOAD(_1, _2, DEMANGLE, ...) DEMANGLE
+#define CSTRING(...) CSTRING_OVERLOAD(__VA_ARGS__, CSTRING2, CSTRING1)(__VA_ARGS__)
+
+#define CSTRING1(name) \
+    char* name;\
+    cstring_init(&name, 32);
+
+#define CSTRING2(name, size) \
+    char* name;\
+    cstring_init(&name, size);
 
 /* BE CAREFUL
  * cstring* expects address of char* associated with cstring
