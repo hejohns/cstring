@@ -37,7 +37,7 @@ int cstring_vsprintf(char** ptr, const char* format, va_list ap){
     int len = vsnprintf(*ptr, cstring_size(*ptr), format, ap);
     if(len < 0){
         //snprintf returns negative len if error occurred
-        *ptr = '\0';
+        **ptr = '\0';
         return -1;
     }
     else if(len >= (int)cstring_size(*ptr)){
@@ -72,7 +72,7 @@ int cstring_sprintf(char** ptr, const char* format, ...){
     va_end(args);
     if(len < 0){
         //snprintf returns negative len if error occurred
-        *ptr = '\0';
+        **ptr = '\0';
         return -1;
     }
     else if(len >= (int)cstring_size(*ptr)){
