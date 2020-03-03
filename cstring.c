@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include "cstring.h"
 
 
 static size_t cstring_size(char* ptr){
     /* helper
      */
-    //size_t keeping track of size is directly before char*
+    // size_t keeping track of size is directly before char*
     size_t* begOfMallocedMem = (size_t*)(ptr-sizeof(size_t));
     return *begOfMallocedMem;
 }
@@ -93,8 +94,21 @@ int cstring_sprintf(char** ptr, const char* format, ...){
 }
 
 char* cstring_strcat(char** dest, char* src){
-    char* destCpy = strdup(*dest);
-    cstring_sprintf(dest, "%s%s", destCpy, src);
-    free(destCpy);
+    size_t destLen = strlen(*dest);
+    size_t srcLen = strlen(src);
+    if(destLen + srcLen >= cstring_size(*dest)){
+        // *dest not large enough to hold resultant string
+        // this is really just emulating strdup
+        // to adhere to iso c
+        CSTRING(destCpy, destLen+srcLen+1);
+        cstring_sprintf(&destCpy, "%s", *dest);
+        cstring_sprintf(dest, "%s%s", destCpy, src);
+        cstring_free(&destCpy);
+    }
+    else{
+        // *dest is large enough to hold resultant string
+        char* nextByte = (*dest)+destLen;
+        memcpy(nextByte, src, strlen(src)+1);
+    }
     return *dest;
 }
