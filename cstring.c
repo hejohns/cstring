@@ -42,7 +42,7 @@ int cstring_vsprintf(char** ptr, const char* format, va_list ap){
     }
     else if(len >= (int)cstring_size(*ptr)){
         char* tmp = *ptr-sizeof(size_t);
-        char* tmp2 = realloc(tmp, sizeof(size_t)+len+1);
+        char* tmp2 = realloc(tmp, CSTRING_MULTIPLIER*(sizeof(size_t)+len+1));
         if(tmp == NULL){
             fprintf(stderr, \
                 "could not allocate memory for string. Attmempting to continue...\n");
@@ -77,7 +77,7 @@ int cstring_sprintf(char** ptr, const char* format, ...){
     }
     else if(len >= (int)cstring_size(*ptr)){
         char* tmp = *ptr-sizeof(size_t);
-        char* tmp2 = realloc(tmp, sizeof(size_t)+len+1);
+        char* tmp2 = realloc(tmp, CSTRING_MULTIPLIER*(sizeof(size_t)+len+1));
         if(tmp == NULL){
             fprintf(stderr, \
                 "could not allocate memory for string. Attmempting to continue...\n");
@@ -98,17 +98,23 @@ char* cstring_strcat(char** dest, char* src){
     size_t srcLen = strlen(src);
     if(destLen + srcLen >= cstring_size(*dest)){
         // *dest not large enough to hold resultant string
-        // this is really just emulating strdup
-        // to adhere to iso c
-        CSTRING(destCpy, destLen+srcLen+1);
-        cstring_sprintf(&destCpy, "%s", *dest);
-        cstring_sprintf(dest, "%s%s", destCpy, src);
-        cstring_free(&destCpy);
+        // this is really just emulating strdup in order to adhere to iso c
+        CSTRING(destCpy, CSTRING_MULTIPLIER*(destLen+srcLen+1));
+        cstring_sprintf(&destCpy, "%s%s", *dest, src);
+        /* silently replace *dest with destCpy so *dest
+         * does not need to realloc everytime one byte is concatonated
+         *
+         * tune CSTRING_MULTIPLIER to reduce memory wastage/increase
+         * frequency of calls to realloc
+         */
+        cstring_free(dest);
+        *dest = destCpy;
+        return destCpy;
     }
     else{
         // *dest is large enough to hold resultant string
         char* nextByte = (*dest)+destLen;
         memcpy(nextByte, src, strlen(src)+1);
+        return *dest;
     }
-    return *dest;
 }

@@ -15,6 +15,8 @@
     char* name;\
     cstring_init(&name, size);
 
+#define CSTRING_MULTIPLIER 2
+
 /* BE CAREFUL
  * cstring* expects address of char* associated with cstring
  * to modify char* if necessary
