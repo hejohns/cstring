@@ -17,6 +17,12 @@
 
 #define CSTRING_MULTIPLIER 2
 
+/* Since this seems to be my interesting macro collection anyways
+ * #define TYPE_ELSE_FAIL_BUILD(type, checkee) do{(void*)(1 ? &checkee : (type*)0)} while(false)
+ * I have the feeling this will generate a unused whatever warning. Haven't actually tried yet.
+ * https://stackoverflow.com/a/31805233/13306604
+ */
+
 /* BE CAREFUL
  * cstring* expects address of char* associated with cstring
  * to modify char* if necessary
