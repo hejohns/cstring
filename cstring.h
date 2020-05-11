@@ -1,6 +1,8 @@
 //cstring.h
 #ifndef CSTRING_H
 #define CSTRING_H
+#include <stdlib.h>
+#include <stdarg.h>
 
 /* BE CAREFUL
  * cstring* expects address of char* associated with cstring

@@ -1,4 +1,5 @@
 //cstring.c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -19,7 +20,7 @@ inline size_t cstring_capacity(char* ptr){
 }
 
 static void cstring_safe_realloc(char** ptr, size_t size){
-    char* tmp = realloc(*ptr-sizeof(size_t), sizeof(size_t)+size+1);
+    char* tmp = (char*)realloc(*ptr-sizeof(size_t), sizeof(size_t)+size+1);
     if(tmp == NULL){
         fprintf(stderr,\
             "%s, %s, %d: could not allocate memory for cstring."\
@@ -32,7 +33,7 @@ static void cstring_safe_realloc(char** ptr, size_t size){
 
 char* cstring_init(char** ptr, size_t size){
     // +sizeof(size_t) to keep track of size
-    *ptr = calloc(sizeof(size_t)+size+1, 1);
+    *ptr = (char*)calloc(sizeof(size_t)+size+1, 1);
     size_t* begOfMallocedMem = (size_t*)(*ptr);
     *begOfMallocedMem = size;
     *ptr += sizeof(size_t);

@@ -3,9 +3,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+
 #include "cstring.h"
 
-#define panic2(mesg, exit_code) (fprintf(stderr, "fatal: "mesg", %s, %s, %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__), exit(exit_code))
+#define panic2(mesg, exit_code) (fprintf(stderr, "fatal: " mesg ", %s, %s, %d\n", __FILE__, __PRETTY_FUNCTION__, __LINE__), exit(exit_code))
 
 void cstring_vsprintf_test(char** str, const char* fmt, ...);
 
