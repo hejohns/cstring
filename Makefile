@@ -13,4 +13,4 @@ test: cstring_tests.exe grid2d_tests.exe
 	valgrind ./cstring_tests.exe
 	valgrind ./grid2d_tests.exe
 clean: 
-	printf "cstring_tests.exe\n" | xargs -L 1 rm
+	printf "cstring_tests.exe\ngrid2d_tests.exe" | xargs -L 1 rm
