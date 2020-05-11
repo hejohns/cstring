@@ -2,7 +2,7 @@
 #ifndef CSTRING_H
 #define CSTRING_H
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
