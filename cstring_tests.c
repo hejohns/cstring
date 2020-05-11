@@ -50,6 +50,12 @@ int main(){
         for(size_t i=0; i < cstring_capacity(str8); i++){
             str8[i] = i%26+'A';
         }
+        strcpy(str8, "this is a short string");
+        cstring_shrink_to_fit(&str8);
+        cstring_reserve(&str8, 1000000);
+        for(size_t i=0; i<1000000; i++){
+            str8[i] = '!';
+        }
         cstring_free(&str8);
     }
     return 0;

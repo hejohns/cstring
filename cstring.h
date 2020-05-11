@@ -36,6 +36,7 @@ static void cstring_safe_realloc(char** ptr, size_t size){
             "Attmempting to continue...\n", __FILE__, __func__, __LINE__);
     }
     else{
+        *(size_t*)tmp = size;
         *ptr = tmp+sizeof(size_t);
     }
 }
