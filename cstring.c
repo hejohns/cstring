@@ -11,7 +11,7 @@
 static const int CSTRING_MULTIPLIER = 2;
 
 
-inline size_t cstring_capacity(char* ptr){
+extern inline size_t cstring_capacity(char* ptr){
     /* helper
      */
     // size_t keeping track of capacity is directly before char*
@@ -41,7 +41,7 @@ char* cstring_init(char** ptr, size_t size){
     return *ptr;
 }
 
-inline void cstring_free(char** ptr){
+extern inline void cstring_free(char** ptr){
     free(*ptr-sizeof(size_t));
     *ptr = NULL;
 }
@@ -105,13 +105,13 @@ char* cstring_strcat(char** dest, char* src){
     }
 }
 
-inline void cstring_reserve(char** ptr, size_t size){
+extern inline void cstring_reserve(char** ptr, size_t size){
     // If new capacity is greater, reallocate storage. Otherwise does nothing
     if(sizeof(size_t)+size+1 > cstring_capacity(*ptr)){
         cstring_safe_realloc(ptr, size);
     }
 }
 
-inline void cstring_shrink_to_fit(char** ptr){
+extern inline void cstring_shrink_to_fit(char** ptr){
     cstring_safe_realloc(ptr, strlen(*ptr));
 }
