@@ -22,14 +22,13 @@ static const int CSTRING_MULTIPLIER = 2;
 
 
 static inline size_t cstring_capacity(char* ptr){
-    /* helper
-     */
     // size_t keeping track of capacity is directly before char*
     size_t* begOfMallocedMem = (size_t*)(ptr-sizeof(size_t));
     return *begOfMallocedMem;
 }
 
 static void cstring_safe_realloc(char** ptr, size_t size){
+    // not really meant to be called by user
     char* tmp = (char*)realloc(*ptr-sizeof(size_t), sizeof(size_t)+size+1);
     if(tmp == NULL){
         fprintf(stderr,\
