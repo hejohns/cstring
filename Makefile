@@ -12,4 +12,4 @@ cstring_tests.o: cstring_tests.c
 test: cstring_tests.exe
 	valgrind ./cstring_tests.exe
 clean: 
-	find cstring_tests.exe | xargs rm
+	printf "cstring_tests.exe\ncstring.o\ncstring_tests.o" | xargs -L 1 rm
