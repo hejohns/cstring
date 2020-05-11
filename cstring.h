@@ -1,6 +1,11 @@
 //cstring.h
 #ifndef CSTRING_H
 #define CSTRING_H
+
+#ifdef _cplusplus
+extern "C" {
+#endif
+
 #include <stdlib.h>
 #include <stdarg.h>
 
@@ -26,5 +31,9 @@ char* cstring_strcat(char** dest, char* src);
 inline void cstring_reserve(char** ptr, size_t size);
 
 inline void cstring_shrink_to_fit(char** ptr);
+
+#ifdef _cplusplus
+}
+#endif
 
 #endif /* CSTRING_H */
