@@ -1,16 +1,21 @@
 CC := gcc
+CC2 := clang
 CFLAGS := -std=c11 -Wall -Wextra -ggdb
 CXX := g++
 CXXFLAGS := -std=c++11 -Wall -Wextra -ggdb
 
-.PHONY: test clean
+.PHONY: default test clean
 
-cstring_tests.exe: cstring_tests.c
+default:
+	make test
+cstring_tests_gcc.exe: cstring_tests.c
 	$(CC) $(CFLAGS) $^ -o $@
+cstring_tests_clang.exe: cstring_tests.c
+	$(CC2) $(CFLAGS) $^ -o $@
 grid2d_tests.exe: grid2d_tests.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
-test: cstring_tests.exe grid2d_tests.exe
-	valgrind ./cstring_tests.exe
-	valgrind ./grid2d_tests.exe
+test: cstring_tests_gcc.exe cstring_tests_clang.exe
+	valgrind ./cstring_tests_gcc.exe
+	valgrind ./cstring_tests_clang.exe
 clean: 
-	rm *.exe massif*
+	rm *.exe

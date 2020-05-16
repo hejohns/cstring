@@ -43,7 +43,7 @@ int main(){
     if(strcmp(str, cmp)) panic2("", EXIT_FAILURE);
     //need to free or else valgrind thinks we've lost pointer to malloced memory
     cstring_free(&str);
-    //cstring_capacity
+    /* cstring_capacity */
     {
         char* str8;
         cstring_init(&str8, 8192000);
@@ -57,6 +57,13 @@ int main(){
             str8[i] = '!';
         }
         cstring_free(&str8);
+    }
+    // I cannot read the other tests at all
+    {
+        char* str2;
+        cstring_init(&str2, 2);
+        cstring_sprintf(&str2, "hello");
+        cstring_free(&str2);
     }
     return 0;
 }
