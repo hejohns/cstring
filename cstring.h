@@ -18,41 +18,51 @@ extern "C" {
  * NEVER pass char* directly into a cstring function
  */
 
+// change int to something smaller if allowable
+/* Don't use anything larger than int since *printf functions don't play well 
+ * with above int size. Anyways, why would you want a single cstring that long??
+ */
+typedef int cstring_size_type;
+
+// change multiplier to something smaller if string lengths are relatively short
 static const int CSTRING_MULTIPLIER = 2;
 
 
-static inline size_t cstring_capacity(char* ptr){
+static inline cstring_size_type cstring_capacity(char* ptr){
     // size_t keeping track of capacity is directly before char*
-    size_t* begOfMallocedMem = (size_t*)(ptr-sizeof(size_t));
-    return *begOfMallocedMem;
+    return *(cstring_size_type*)(ptr-sizeof(cstring_size_type));
 }
 
-static void cstring_safe_realloc(char** ptr, size_t size){
+// just to be clear, size is "nice" usable size, not total size allocated by *alloc
+static void cstring_safe_realloc(char** ptr, cstring_size_type size){
     // not really meant to be called by user
-    char* tmp = (char*)realloc(*ptr-sizeof(size_t), sizeof(size_t)+size+1);
+    char* tmp = (char*)realloc(*ptr-sizeof(cstring_size_type), sizeof(cstring_size_type)+size+1);
     if(tmp == NULL){
-        fprintf(stderr,\
+        //fprintf(stderr,\
             "%s, %s, %d: could not allocate memory for cstring."\
             "Attmempting to continue...\n", __FILE__, __func__, __LINE__);
+        // Unless you really want ot keep going no matter what, exit immediatly
+        // Helps to debug the real issue
+        exit(EXIT_FAILURE);
     }
     else{
-        *(size_t*)tmp = size;
-        *ptr = tmp+sizeof(size_t);
+        *(cstring_size_type*)tmp = size;
+        *ptr = tmp+sizeof(cstring_size_type);
     }
 }
 
-static char* cstring_init(char** ptr, size_t size){
-    // +sizeof(size_t) to keep track of size
-    *ptr = (char*)calloc(sizeof(size_t)+size+1, 1);
-    size_t* begOfMallocedMem = (size_t*)(*ptr);
-    *begOfMallocedMem = size;
-    *ptr += sizeof(size_t);
-    *(*ptr+size) = '\0';
+static char* cstring_init(char** ptr, cstring_size_type size){
+    // +sizeof(cstring_size_type) to keep track of size
+    *ptr = (char*)calloc(sizeof(cstring_size_type)+size+1, 1);
+    *(cstring_size_type*)(*ptr) = size;
+    *ptr += sizeof(cstring_size_type);
+    // not necessary strictly speaking
+    //*(*ptr+size) = '\0';
     return *ptr;
 }
 
 static inline void cstring_free(char** ptr){
-    free(*ptr-sizeof(size_t));
+    free(*ptr-sizeof(cstring_size_type));
     *ptr = NULL;
 }
 
@@ -63,8 +73,9 @@ static int cstring_vsprintf(char** ptr, const char* format, va_list ap){
     va_copy(args2, ap);
     int len = vsnprintf(*ptr, cstring_capacity(*ptr)+1, format, ap);
     if(len < 0){
-        //snprintf returns negative len if error occurred
+        // snprintf returns negative len if error occurred
         **ptr = '\0';
+        // pass on len for handling by caller
         return len;
     }
     else if(len > (int)cstring_capacity(*ptr)){
@@ -88,36 +99,19 @@ static int cstring_sprintf(char** ptr, const char* format, ...){
 }
 
 static char* cstring_strcat(char** dest, char* src){
-    size_t destLen = strlen(*dest);
-    size_t srcLen = strlen(src);
-    if(destLen + srcLen >= cstring_capacity(*dest)){
+    cstring_size_type destLen = strlen(*dest);
+    cstring_size_type srcLen = strlen(src);
+    if(destLen + srcLen > cstring_capacity(*dest)){
         // *dest not large enough to hold resultant string
-        // this is really just emulating strdup
-        char* destCpy;
-        cstring_init(&destCpy, destLen+srcLen+1);
-        cstring_sprintf(&destCpy, "%s%s", *dest, src);
-        /* silently replace *dest with destCpy
-         *
-         * tune CSTRING_MULTIPLIER to reduce memory wastage/increase
-         * frequency of calls to realloc
-         */
-        cstring_free(dest);
-        *dest = destCpy;
-        return destCpy;
+        cstring_safe_realloc(dest, destLen+srcLen);
     }
-    else{
-        // *dest is large enough to hold resultant string
-        // haven't look at generated code but it's written like so
-        // to not recalculate strlen (vs using strcat)
-        char* nextByte = (*dest)+destLen;
-        memcpy(nextByte, src, strlen(src)+1);
+        memcpy((*dest)+destLen, src, srcLen+1);
         return *dest;
-    }
 }
 
-static inline void cstring_reserve(char** ptr, size_t size){
+static inline void cstring_reserve(char** ptr, cstring_size_type size){
     // If new capacity is greater, reallocate storage. Otherwise does nothing
-    if(sizeof(size_t)+size+1 > cstring_capacity(*ptr)){
+    if(sizeof(cstring_size_type)+size+1 > (size_t)cstring_capacity(*ptr)){
         cstring_safe_realloc(ptr, size);
     }
 }
