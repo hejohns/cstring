@@ -56,7 +56,7 @@ static inline void cstring_safe_realloc(char** ptr, cstring_size_type size){
     }
 }
 
-static inine char* cstring_init(char** ptr, cstring_size_type size){
+static inline char* cstring_init(char** ptr, cstring_size_type size){
     // +sizeof(cstring_size_type) to keep track of size
     *ptr = (char*)calloc(sizeof(cstring_size_type)+size+1, 1);
     *(cstring_size_type*)(*ptr) = size;
