@@ -37,7 +37,7 @@ static inline cstring_size_type cstring_capacity(const char* ptr){
 }
 
 // just to be clear, size is "nice" usable size, not total size allocated by *alloc
-static void cstring_safe_realloc(char** ptr, cstring_size_type size){
+static inline void cstring_safe_realloc(char** ptr, cstring_size_type size){
     // not really meant to be called by user
     char* tmp = (char*)realloc(*ptr-sizeof(cstring_size_type), sizeof(cstring_size_type)+size+1);
     if(tmp == NULL){
@@ -71,7 +71,7 @@ static inline void cstring_free(char** ptr){
     *ptr = NULL;
 }
 
-static int cstring_vsprintf(char** ptr, const char* format, va_list ap){
+static inline int cstring_vsprintf(char** ptr, const char* format, va_list ap){
 /* https://stackoverflow.com/questions/37947200/c-variadic-wrapper
  */
     va_list args2;
@@ -103,7 +103,7 @@ static int cstring_sprintf(char** ptr, const char* format, ...){
     return ret;
 }
 
-static char* cstring_strcat(char** dest, const char* src){
+static inline char* cstring_strcat(char** dest, const char* src){
     cstring_size_type destLen = (cstring_size_type)strlen(*dest);
     cstring_size_type srcLen = (cstring_size_type)strlen(src);
     if(destLen + srcLen > cstring_capacity(*dest)){
