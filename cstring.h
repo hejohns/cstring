@@ -31,7 +31,7 @@ typedef int cstring_size_type;
 static const int CSTRING_MULTIPLIER = 2;
 
 
-static inline cstring_size_type cstring_capacity(char* ptr){
+static inline cstring_size_type cstring_capacity(const char* ptr){
     // size_t keeping track of capacity is directly before char*
     return *(cstring_size_type*)(ptr-sizeof(cstring_size_type));
 }
@@ -103,7 +103,7 @@ static int cstring_sprintf(char** ptr, const char* format, ...){
     return ret;
 }
 
-static char* cstring_strcat(char** dest, char* src){
+static char* cstring_strcat(char** dest, const char* src){
     cstring_size_type destLen = (cstring_size_type)strlen(*dest);
     cstring_size_type srcLen = (cstring_size_type)strlen(src);
     if(destLen + srcLen > cstring_capacity(*dest)){
