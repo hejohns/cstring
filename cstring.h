@@ -125,7 +125,7 @@ static inline void cstring_shrink_to_fit(char** ptr){
     cstring_safe_realloc(ptr, (cstring_size_type)strlen(*ptr));
 }
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 
