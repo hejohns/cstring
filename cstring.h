@@ -21,6 +21,9 @@ extern "C" {
 // change int to something smaller if allowable
 /* Don't use anything larger than int since *printf functions don't play well 
  * with above int size. Anyways, why would you want a single cstring that long??
+ *
+ * There are casts to hide conversion warnings if you choose a small type
+ * It is up to you to make sure no overflows occur
  */
 typedef int cstring_size_type;
 
@@ -101,8 +104,8 @@ static int cstring_sprintf(char** ptr, const char* format, ...){
 }
 
 static char* cstring_strcat(char** dest, char* src){
-    cstring_size_type destLen = strlen(*dest);
-    cstring_size_type srcLen = strlen(src);
+    cstring_size_type destLen = (cstring_size_type)strlen(*dest);
+    cstring_size_type srcLen = (cstring_size_type)strlen(src);
     if(destLen + srcLen > cstring_capacity(*dest)){
         // *dest not large enough to hold resultant string
         cstring_safe_realloc(dest, destLen+srcLen);
@@ -119,7 +122,7 @@ static inline void cstring_reserve(char** ptr, cstring_size_type size){
 }
 
 static inline void cstring_shrink_to_fit(char** ptr){
-    cstring_safe_realloc(ptr, strlen(*ptr));
+    cstring_safe_realloc(ptr, (cstring_size_type)strlen(*ptr));
 }
 
 #ifdef _cplusplus
