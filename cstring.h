@@ -46,7 +46,7 @@ static inline void cstring_safe_realloc(char** ptr, cstring_size_type size){
             "%s, %s, %d: could not allocate memory for cstring."
             "Attmempting to continue...\n", __FILE__, __func__, __LINE__);
         */
-        // Unless you really want ot keep going no matter what, exit immediatly
+        // Unless you really want to keep going no matter what, exit immediatly
         // Helps to debug the real issue
         exit(EXIT_FAILURE);
     }
@@ -59,6 +59,9 @@ static inline void cstring_safe_realloc(char** ptr, cstring_size_type size){
 static inline char* cstring_init(char** ptr, cstring_size_type size){
     // +sizeof(cstring_size_type) to keep track of size
     *ptr = (char*)calloc(sizeof(cstring_size_type)+size+1, 1);
+    if(ptr == NULL){
+        exit(EXIT_FAILURE);
+    }
     *(cstring_size_type*)(*ptr) = size;
     *ptr += sizeof(cstring_size_type);
     // not necessary strictly speaking
