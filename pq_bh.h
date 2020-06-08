@@ -1,14 +1,14 @@
-// pq_binary_heap.h
+// pq_bh.h
 /*
- * Don't include ifndef guards so that multiple pq_binary_heaps of 
+ * Don't include ifndef guards so that multiple pq_bhs of 
  * different types can be declared (just be careful). 
  */
 
 /* When using this header, put something like
- * #define PQ_BINARY_HEAP_TYPE int
- * #include "pq_binary_heap.h"
+ * #define PQ_BH_TYPE int
+ * #include "pq_bh.h"
  * 
- * (PQ_BINARY_HEAP_TYPE is not defined here)
+ * (PQ_BH_TYPE is not defined here)
  */
 /* Either mark all functions as static and only inlclude
  * this file in .c files, or mark all functions extern and
@@ -21,31 +21,31 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#ifndef PQ_BINARY_HEAP_TYPE
+#ifndef PQ_BH_TYPE
 #error
 #endif
 
-#define PQ_BINARY_HEAP_DEFINE(T)                           \
-    typedef struct pq_binary_heap_ ## T{                   \
+#define PQ_BH_DEFINE(T)                           \
+    typedef struct pq_bh_ ## T{                   \
         T *arr;                                            \
         /* const function pointer to hopefully encourage inlining */\
         bool (*const less)(const T *, const T *);          \
         size_t size;                                       \
         size_t capacity;                                   \
-    } pq_binary_heap_ ## T;                                \
+    } pq_bh_ ## T;                                \
                                                            \
-static void pq_binary_heap_ ## T ## _init(pq_binary_heap_ ## T *pq, size_t size){\
+static void pq_bh_ ## T ## _init(pq_bh_ ## T *pq, size_t size){\
     pq->arr = malloc(size*sizeof(T));                      \
     pq->size = 0;                                          \
     pq->capacity = size;                                   \
 }                                                          \
                                                            \
-static void pq_binary_heap_ ## T ## _free(pq_binary_heap_ ## T *pq){\
+static void pq_bh_ ## T ## _free(pq_bh_ ## T *pq){\
     free(pq->arr);                                         \
     pq->arr = NULL;                                        \
 }                                                          \
                                                            \
-static void pq_binary_heap_ ## T ## _siftDown(pq_binary_heap_ ## T *pq, size_t index){\
+static void pq_bh_ ## T ## _siftDown(pq_bh_ ## T *pq, size_t index){\
     size_t index_lchild; /* left child or lesser child */  \
     while(2*index+1 <= pq->size-1){                        \
         index_lchild = 2*index+1;                          \
@@ -66,7 +66,7 @@ static void pq_binary_heap_ ## T ## _siftDown(pq_binary_heap_ ## T *pq, size_t i
     }                                                      \
 }                                                          \
                                                            \
-static void pq_binary_heap_ ## T ## _siftUp(pq_binary_heap_ ## T *pq, size_t index){\
+static void pq_bh_ ## T ## _siftUp(pq_bh_ ## T *pq, size_t index){\
     while(index != 0){                                     \
         if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){\
             {                                              \
@@ -82,7 +82,7 @@ static void pq_binary_heap_ ## T ## _siftUp(pq_binary_heap_ ## T *pq, size_t ind
     }                                                      \
 }                                                          \
                                                            \
-static void pq_binary_heap_ ## T ## _make_heap(pq_binary_heap_ ## T *pq){\
+static void pq_bh_ ## T ## _make_heap(pq_bh_ ## T *pq){\
     /* Floyd's heap algorithm */                           \
     if(pq->size <= 1){                                     \
         return;                                            \
@@ -92,13 +92,13 @@ static void pq_binary_heap_ ## T ## _make_heap(pq_binary_heap_ ## T *pq){\
     }                                                      \
     while(--height){                                       \
         for(size_t i=0; i < (2<<(height-1)); i++){         \
-            pq_binary_heap_ ## T ## _siftDown(pq, (2<<(height-1))-1+i);\
+            pq_bh_ ## T ## _siftDown(pq, (2<<(height-1))-1+i);\
         }                                                  \
     }                                                      \
-    pq_binary_heap_ ## T ## _siftDown(pq, 0);              \
+    pq_bh_ ## T ## _siftDown(pq, 0);              \
 }                                                          \
                                                            \
-static void pq_binary_heap_ ## T ## _push(pq_binary_heap_ ## T *pq, const T *value){\
+static void pq_bh_ ## T ## _push(pq_bh_ ## T *pq, const T value){\
     if(!(pq->size < pq->capacity)){                        \
         T* tmp = realloc(pq->arr, 2*(pq->size*sizeof(T))); \
         if(tmp){                                           \
@@ -109,18 +109,23 @@ static void pq_binary_heap_ ## T ## _push(pq_binary_heap_ ## T *pq, const T *val
             exit(EXIT_FAILURE);                            \
         }                                                  \
     }                                                      \
-    (pq->arr)[pq->size] = *value;                          \
+    (pq->arr)[pq->size] = value;                          \
     pq->size++;                                            \
+    pq_bh_ ## T ## _siftUp(pq, pq->size-1);       \
 }                                                          \
                                                            \
-static void pq_binary_heap_ ## T ## _pop(pq_binary_heap_ ## T *pq){\
+static void pq_bh_ ## T ## _push_by_ref(pq_bh_ ## T *pq, const T *value){\
+    pq_bh_ ## T ## _push(pq, *value);             \
+}                                                          \
+                                                           \
+static void pq_bh_ ## T ## _pop(pq_bh_ ## T *pq){\
     (pq->arr)[0] = (pq->arr)[pq->size-1];                  \
     pq->size--;                                            \
-    pq_binary_heap_ ## T ## _siftDown(pq, 0);              \
+    pq_bh_ ## T ## _siftDown(pq, 0);              \
 }                                                          \
                                                            \
-/* PQ_BINARY_HEAP_DEFINE(T) */
+/* PQ_BH_DEFINE(T) */
 
-#define PQ_BINARY_HEAP_DEFINE_HELPER(x) PQ_BINARY_HEAP_DEFINE(x)
-PQ_BINARY_HEAP_DEFINE_HELPER(PQ_BINARY_HEAP_TYPE)
-#undef PQ_BINARY_HEAP_TYPE
+#define PQ_BH_DEFINE_HELPER(x) PQ_BH_DEFINE(x)
+PQ_BH_DEFINE_HELPER(PQ_BH_TYPE)
+#undef PQ_BH_TYPE
