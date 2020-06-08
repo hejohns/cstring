@@ -16,6 +16,10 @@
  * .c for all your other code to link against.
  * By default, all functions will be marked static so it's 
  * more convenient when you really just use one pq anyways.
+ * 
+ * The downside to this macro abuse is that things like
+ * function call type mismatch will invoke pages of compiler 
+ * errors (flashbacks to C++ templates) :(
  */
 
 #include <stdlib.h>
