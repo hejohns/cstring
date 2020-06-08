@@ -10,5 +10,7 @@
 #include "pq_binary_heap.h"
 
 int main(void){
+    pq_binary_heap_int pq_int;
+    pq_binary_heap_double pq_double;
     return 0;
 }
