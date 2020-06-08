@@ -1,0 +1,35 @@
+// pq_binary_heap.h
+/*
+ * Don't include ifndef guards so that multiple pq_binary_heaps of 
+ * different types can be declared (just be careful). 
+ */
+
+/* When using this header, put something like
+ * #define PQ_BINARY_HEAP_TYPE int
+ * #include "pq_binary_heap.h"
+ * 
+ * (PQ_BINARY_HEAP_TYPE is not defined here)
+ */
+
+#include <stdlib.h>
+
+#ifndef PQ_BINARY_HEAP_TYPE
+#error
+#endif
+
+#define PQ_BINARY_HEAP_DEFINE(T)                           \
+    typedef struct pq_binary_heap_ ## T{                   \
+        T* arr;                                            \
+    } pq_binary_heap_ ## T;                                \
+                                                           \
+static void pq_binary_heap_ ## T ## _init(pq_binary_heap_ ## T *pq){ \
+    pq->arr = malloc(sizeof(T));                           \
+}                                                          \
+                                                           \
+static void pq_binary_heap_ ## T ## _free(pq_binary_heap_ ## T *pq){      \
+    (void)0;                                               \
+}
+
+#define PQ_BINARY_HEAP_DEFINE_HELPER(x) PQ_BINARY_HEAP_DEFINE(x)
+PQ_BINARY_HEAP_DEFINE_HELPER(PQ_BINARY_HEAP_TYPE)
+#undef PQ_BINARY_HEAP_TYPE
