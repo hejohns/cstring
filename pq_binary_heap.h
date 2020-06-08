@@ -91,12 +91,34 @@ static void pq_binary_heap_ ## T ## _make_heap(pq_binary_heap_ ## T *pq){\
     for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){\
     }                                                      \
     while(--height){                                       \
-        for(size_t i=0; i < (2<<(height-1)); i++){          \
+        for(size_t i=0; i < (2<<(height-1)); i++){         \
             pq_binary_heap_ ## T ## _siftDown(pq, (2<<(height-1))-1+i);\
         }                                                  \
     }                                                      \
     pq_binary_heap_ ## T ## _siftDown(pq, 0);              \
 }                                                          \
+                                                           \
+static void pq_binary_heap_ ## T ## _push(pq_binary_heap_ ## T *pq, const T *value){\
+    if(!(pq->size < pq->capacity)){                        \
+        T* tmp = realloc(pq->arr, 2*(pq->size*sizeof(T))); \
+        if(tmp){                                           \
+            pq->arr = tmp;                                 \
+            pq->capacity *= 2;                             \
+        }                                                  \
+        else{                                              \
+            exit(EXIT_FAILURE);                            \
+        }                                                  \
+    }                                                      \
+    (pq->arr)[pq->size] = *value;                          \
+    pq->size++;                                            \
+}                                                          \
+                                                           \
+static void pq_binary_heap_ ## T ## _pop(pq_binary_heap_ ## T *pq){\
+    (pq->arr)[0] = (pq->arr)[pq->size-1];                  \
+    pq->size--;                                            \
+    pq_binary_heap_ ## T ## _siftDown(pq, 0);              \
+}                                                          \
+                                                           \
 /* PQ_BINARY_HEAP_DEFINE(T) */
 
 #define PQ_BINARY_HEAP_DEFINE_HELPER(x) PQ_BINARY_HEAP_DEFINE(x)
