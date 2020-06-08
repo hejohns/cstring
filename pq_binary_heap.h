@@ -46,24 +46,56 @@ static void pq_binary_heap_ ## T ## _free(pq_binary_heap_ ## T *pq){\
 }                                                          \
                                                            \
 static void pq_binary_heap_ ## T ## _siftDown(pq_binary_heap_ ## T *pq, size_t index){\
-        size_t index_lchild; /* left child or lesser child */\
-        while(2*index+1 <= pq->size-1){                    \
-            index_lchild = 2*index+1;                      \
-            if(index_lchild+1 <= pq->size-1){              \
-                if(pq->less(pq->arr+index_lchild, pq->arr+index_lchild+1)){\
-                    ++index_lchild;                        \
-                }                                          \
+    size_t index_lchild; /* left child or lesser child */  \
+    while(2*index+1 <= pq->size-1){                        \
+        index_lchild = 2*index+1;                          \
+        if(index_lchild+1 <= pq->size-1){                  \
+            if(pq->less(pq->arr+index_lchild, pq->arr+index_lchild+1)){\
+                ++index_lchild;                            \
             }                                              \
-            if(pq->less(pq->arr+index_lchild, pq->arr+index)){\
-                break;                                     \
-            }                                              \
-            else{                                          \
-                T tmp = (pq->arr)[index];                  \
-                (pq->arr)[index] = (pq->arr)[index_lchild];\
-                (pq->arr)[index_lchild] = tmp;             \
-            }                                              \
-            index = index_lchild;                          \
         }                                                  \
+        if(pq->less(pq->arr+index_lchild, pq->arr+index)){ \
+            break;                                         \
+        }                                                  \
+        else{                                              \
+            T tmp = (pq->arr)[index];                      \
+            (pq->arr)[index] = (pq->arr)[index_lchild];    \
+            (pq->arr)[index_lchild] = tmp;                 \
+        }                                                  \
+        index = index_lchild;                              \
+    }                                                      \
+}                                                          \
+                                                           \
+static void pq_binary_heap_ ## T ## _siftUp(pq_binary_heap_ ## T *pq, size_t index){\
+    while(index != 0){                                     \
+        if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){\
+            {                                              \
+                T tmp = (pq->arr)[(index-1)/2];            \
+                (pq->arr)[(index-1)/2] = (pq->arr)[index]; \
+                (pq->arr)[index] = tmp;                    \
+            }                                              \
+            index = (index-1)/2;                           \
+        }                                                  \
+        else{                                              \
+            break;                                         \
+        }                                                  \
+    }                                                      \
+}                                                          \
+                                                           \
+static void pq_binary_heap_ ## T ## _make_heap(pq_binary_heap_ ## T *pq){\
+    /* Floyd's heap algorithm */                           \
+    if(pq->size <= 1){                                     \
+        return;                                            \
+    }                                                      \
+    size_t height = 0;                                     \
+    for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){\
+    }                                                      \
+    while(--height){                                       \
+        for(size_t i=0; i < (2<<(height-1)); i++){          \
+            pq_binary_heap_ ## T ## _siftDown(pq, (2<<(height-1))-1+i);\
+        }                                                  \
+    }                                                      \
+    pq_binary_heap_ ## T ## _siftDown(pq, 0);              \
 }                                                          \
 /* PQ_BINARY_HEAP_DEFINE(T) */
 
