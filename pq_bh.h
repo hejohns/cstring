@@ -25,14 +25,14 @@
 #error
 #endif
 
-#define PQ_BH_DEFINE(T)                           \
-    typedef struct pq_bh_ ## T{                   \
+#define PQ_BH_DEFINE(T)                                    \
+    typedef struct pq_bh_ ## T{                            \
         T *arr;                                            \
         /* const function pointer to hopefully encourage inlining */\
         bool (*const less)(const T *, const T *);          \
         size_t size;                                       \
         size_t capacity;                                   \
-    } pq_bh_ ## T;                                \
+    } pq_bh_ ## T;                                         \
                                                            \
 static void pq_bh_ ## T ## _init(pq_bh_ ## T *pq, size_t size){\
     pq->arr = malloc(size*sizeof(T));                      \
@@ -40,7 +40,7 @@ static void pq_bh_ ## T ## _init(pq_bh_ ## T *pq, size_t size){\
     pq->capacity = size;                                   \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _free(pq_bh_ ## T *pq){\
+static void pq_bh_ ## T ## _free(pq_bh_ ## T *pq){         \
     free(pq->arr);                                         \
     pq->arr = NULL;                                        \
 }                                                          \
@@ -82,7 +82,7 @@ static void pq_bh_ ## T ## _siftUp(pq_bh_ ## T *pq, size_t index){\
     }                                                      \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _make_heap(pq_bh_ ## T *pq){\
+static void pq_bh_ ## T ## _make_heap(pq_bh_ ## T *pq){    \
     /* Floyd's heap algorithm */                           \
     if(pq->size <= 1){                                     \
         return;                                            \
@@ -95,7 +95,7 @@ static void pq_bh_ ## T ## _make_heap(pq_bh_ ## T *pq){\
             pq_bh_ ## T ## _siftDown(pq, (2<<(height-1))-1+i);\
         }                                                  \
     }                                                      \
-    pq_bh_ ## T ## _siftDown(pq, 0);              \
+    pq_bh_ ## T ## _siftDown(pq, 0);                       \
 }                                                          \
                                                            \
 static void pq_bh_ ## T ## _push(pq_bh_ ## T *pq, const T value){\
@@ -109,19 +109,19 @@ static void pq_bh_ ## T ## _push(pq_bh_ ## T *pq, const T value){\
             exit(EXIT_FAILURE);                            \
         }                                                  \
     }                                                      \
-    (pq->arr)[pq->size] = value;                          \
+    (pq->arr)[pq->size] = value;                           \
     pq->size++;                                            \
-    pq_bh_ ## T ## _siftUp(pq, pq->size-1);       \
+    pq_bh_ ## T ## _siftUp(pq, pq->size-1);                \
 }                                                          \
                                                            \
 static void pq_bh_ ## T ## _push_by_ref(pq_bh_ ## T *pq, const T *value){\
-    pq_bh_ ## T ## _push(pq, *value);             \
+    pq_bh_ ## T ## _push(pq, *value);                      \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _pop(pq_bh_ ## T *pq){\
+static void pq_bh_ ## T ## _pop(pq_bh_ ## T *pq){          \
     (pq->arr)[0] = (pq->arr)[pq->size-1];                  \
     pq->size--;                                            \
-    pq_bh_ ## T ## _siftDown(pq, 0);              \
+    pq_bh_ ## T ## _siftDown(pq, 0);                       \
 }                                                          \
                                                            \
 /* PQ_BH_DEFINE(T) */
