@@ -123,9 +123,14 @@ static void pq_bh_ ## T ## _push_by_ref(pq_bh_ ## T *pq, const T *value){\
 }                                                          \
                                                            \
 static void pq_bh_ ## T ## _pop(pq_bh_ ## T *pq){          \
-    (pq->arr)[0] = (pq->arr)[pq->size-1];                  \
-    pq->size--;                                            \
-    pq_bh_ ## T ## _siftDown(pq, 0);                       \
+    if(pq->size > 0){                                      \
+        (pq->arr)[0] = (pq->arr)[pq->size-1];              \
+        pq->size--;                                        \
+        pq_bh_ ## T ## _siftDown(pq, 0);                   \
+    }                                                      \
+    else{                                                  \
+        exit(EXIT_FAILURE);                                \
+    }                                                      \
 }                                                          \
                                                            \
 /* PQ_BH_DEFINE(T) */

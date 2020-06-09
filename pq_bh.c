@@ -39,8 +39,13 @@ int main(void){
     memcpy(pq_double.arr, doubles, 8*sizeof(double));
     pq_double.size = 8;
     pq_bh_double_make_heap(&pq_double);
+    /* make pq from existing array */
+    // just don't push past size or a realloc on an array will occur
+    pq_bh_int pq_int_exist = {.arr=ints, .less=&less_int, .size=8, .capacity=8};
+    pq_bh_int_make_heap(&pq_int_exist);
     /* free the pqs */
     pq_bh_int_free(&pq_int);
     pq_bh_double_free(&pq_double);
+    pq_bh_int_free(&pq_int);
     return 0;
 }
