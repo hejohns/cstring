@@ -32,7 +32,7 @@ static const int CSTRING_MULTIPLIER = 2;
 
 
 static inline cstring_size_type cstring_capacity(const char* ptr){
-    // size_t keeping track of capacity is directly before char*
+    // cstring_size_type keeping track of capacity is directly before char*
     return *(cstring_size_type*)(ptr-sizeof(cstring_size_type));
 }
 
