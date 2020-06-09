@@ -1,14 +1,14 @@
-// pq_bh.h
+// bheap.h
 /*
- * Don't include ifndef guards so that multiple pq_bhs of 
+ * Don't include ifndef guards so that multiple bheaps of 
  * different types can be declared (just be careful). 
  */
 
 /* When using this header, put something like
- * #define PQ_BH_TYPE int
- * #include "pq_bh.h"
+ * #define BHEAP_TYPE int
+ * #include "bheap.h"
  * 
- * (PQ_BH_TYPE is not defined here)
+ * (BHEAP_TYPE is not defined here)
  */
 /* Either mark all functions as static and only inlclude
  * this file in .c files, or mark all functions extern and
@@ -25,31 +25,31 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#ifndef PQ_BH_TYPE
+#ifndef BHEAP_TYPE
 #error
 #endif
 
-#define PQ_BH_DEFINE(T)                                    \
-    typedef struct pq_bh_ ## T{                            \
+#define BHEAP_DEFINE(T)                                    \
+    typedef struct bheap_ ## T{                            \
         T *arr;                                            \
         /* const function pointer to hopefully encourage inlining */\
         bool (*const less)(const T *, const T *);          \
         size_t size;                                       \
         size_t capacity;                                   \
-    } pq_bh_ ## T;                                         \
+    } bheap_ ## T;                                         \
                                                            \
-static void pq_bh_ ## T ## _init(pq_bh_ ## T *pq, size_t size){\
+static void bheap_ ## T ## _init(bheap_ ## T *pq, size_t size){\
     pq->arr = malloc(size*sizeof(T));                      \
     pq->size = 0;                                          \
     pq->capacity = size;                                   \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _free(pq_bh_ ## T *pq){         \
+static void bheap_ ## T ## _free(bheap_ ## T *pq){         \
     free(pq->arr);                                         \
     pq->arr = NULL;                                        \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _siftDown(pq_bh_ ## T *pq, size_t index){\
+static void bheap_ ## T ## _siftDown(bheap_ ## T *pq, size_t index){\
     size_t index_lchild; /* left child or lesser child */  \
     while(2*index+1 <= pq->size-1){                        \
         index_lchild = 2*index+1;                          \
@@ -70,7 +70,7 @@ static void pq_bh_ ## T ## _siftDown(pq_bh_ ## T *pq, size_t index){\
     }                                                      \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _siftUp(pq_bh_ ## T *pq, size_t index){\
+static void bheap_ ## T ## _siftUp(bheap_ ## T *pq, size_t index){\
     while(index != 0){                                     \
         if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){\
             {                                              \
@@ -86,7 +86,7 @@ static void pq_bh_ ## T ## _siftUp(pq_bh_ ## T *pq, size_t index){\
     }                                                      \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _make_heap(pq_bh_ ## T *pq){    \
+static void bheap_ ## T ## _make_heap(bheap_ ## T *pq){    \
     /* Floyd's heap algorithm */                           \
     if(pq->size <= 1){                                     \
         return;                                            \
@@ -94,15 +94,13 @@ static void pq_bh_ ## T ## _make_heap(pq_bh_ ## T *pq){    \
     size_t height = 0;                                     \
     for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){\
     }                                                      \
-    while(--height){                                       \
-        for(size_t i=0; i < (2<<(height-1)); i++){         \
-            pq_bh_ ## T ## _siftDown(pq, (2<<(height-1))-1+i);\
-        }                                                  \
+    for(size_t i=(2<<(height-1))-2; i > 0; i--){           \
+        bheap_ ## T ## _siftDown(pq, i);                   \
     }                                                      \
-    pq_bh_ ## T ## _siftDown(pq, 0);                       \
+    bheap_ ## T ## _siftDown(pq, 0);                       \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _push(pq_bh_ ## T *pq, const T value){\
+static void bheap_ ## T ## _push(bheap_ ## T *pq, const T value){\
     if(!(pq->size < pq->capacity)){                        \
         T* tmp = realloc(pq->arr, 2*(pq->size*sizeof(T))); \
         if(tmp){                                           \
@@ -115,26 +113,26 @@ static void pq_bh_ ## T ## _push(pq_bh_ ## T *pq, const T value){\
     }                                                      \
     (pq->arr)[pq->size] = value;                           \
     pq->size++;                                            \
-    pq_bh_ ## T ## _siftUp(pq, pq->size-1);                \
+    bheap_ ## T ## _siftUp(pq, pq->size-1);                \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _push_by_ref(pq_bh_ ## T *pq, const T *value){\
-    pq_bh_ ## T ## _push(pq, *value);                      \
+static void bheap_ ## T ## _push_by_ref(bheap_ ## T *pq, const T *value){\
+    bheap_ ## T ## _push(pq, *value);                      \
 }                                                          \
                                                            \
-static void pq_bh_ ## T ## _pop(pq_bh_ ## T *pq){          \
+static void bheap_ ## T ## _pop(bheap_ ## T *pq){          \
     if(pq->size > 0){                                      \
         (pq->arr)[0] = (pq->arr)[pq->size-1];              \
         pq->size--;                                        \
-        pq_bh_ ## T ## _siftDown(pq, 0);                   \
+        bheap_ ## T ## _siftDown(pq, 0);                   \
     }                                                      \
     else{                                                  \
         exit(EXIT_FAILURE);                                \
     }                                                      \
 }                                                          \
                                                            \
-/* PQ_BH_DEFINE(T) */
+/* BHEAP_DEFINE(T) */
 
-#define PQ_BH_DEFINE_HELPER(x) PQ_BH_DEFINE(x)
-PQ_BH_DEFINE_HELPER(PQ_BH_TYPE)
-#undef PQ_BH_TYPE
+#define BHEAP_DEFINE_HELPER(x) BHEAP_DEFINE(x)
+BHEAP_DEFINE_HELPER(BHEAP_TYPE)
+#undef BHEAP_TYPE
