@@ -12,10 +12,15 @@
  */
 /* Either mark all functions as static and only inlclude
  * this file in .c files, or mark all functions extern and
- * put all the PQ_BINARY_HEAP_TYPEs you want into a single
+ * put all the BHEAP_TYPEs you want into a single
  * .c for all your other code to link against.
+ *
  * By default, all functions will be marked static so it's 
  * more convenient when you really just use one pq anyways.
+ * If you want the extern version, use
+ * make bheap_extern.h
+ * If I actually need it someday, I'll make a .h to correspond
+ * to bheap_extern.h
  * 
  * The downside to this macro abuse is that things like
  * function call type mismatch will invoke pages of compiler 
