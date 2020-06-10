@@ -18,11 +18,13 @@ extern "C" {
  * NEVER pass char* directly into a cstring function
  */
 
-// change int to something smaller if allowable
+// change int to something smaller if allowable.
+// However, you will get lots of conversion warnings/errors.
 /* Don't use anything larger than int since *printf functions don't play well 
- * with above int size. Anyways, why would you want a single cstring that long??
+ * with types larger than int.
+ * Anyways, why would you want a single cstring that long??
  *
- * There are casts to hide conversion warnings if you choose a small type
+ * There are some casts to hide conversion warnings if you choose a small type
  * It is up to you to make sure no overflows occur
  */
 typedef int cstring_size_type;
