@@ -9,6 +9,8 @@ CXXFLAGS := -std=c++20 -Wall -Wextra -ggdb
 .PHONY: default clean
 
 default:
-	make clean
+	git push origin
+	git push gitlab_eecs
+	git push gitlab_umich
 clean: 
 	rm *.exe 
