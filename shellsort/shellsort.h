@@ -14,14 +14,18 @@
         } while(--sz > 0);                                 \
     } while(false)
 
-/* This is more complicated than it needs to be, but in my head
- * this made more sense, doing k-sorting passes with offsets
+#define SHELLSORT_CONCATONATE(a, b) a ## b
+
+/* optimize for cache by reordering loops
  */
-#define SHELLSORT(base, nmemb, size, less, gap)            \
+#define SHELLSORT(base, nmemb, size, less, gap, id)        \
     do{                                                    \
-        for(size_t i = 0; i < gap; i++){                   \
-            for(size_t j = i+gap; j < nmemb; j += gap){    \
-                for(size_t k = j; k >= gap; k -= gap){     \
+        for(size_t i = gap; ; i += gap){                   \
+            for(size_t j = 0; j < gap; j++){               \
+                if(j+i >= nmemb){                          \
+                    goto SHELLSORT_CONCATONATE(done, id);  \
+                }                                          \
+                for(size_t k = j+i; k >= j+gap; k -= gap){\
                     if(less(base+(k*size), base+((k-gap)*size))){\
                         SHELLSORT_SWAP((base+(k*size)), (base+((k-gap)*size)), size);\
                     }                                      \
@@ -31,6 +35,7 @@
                 }                                          \
             }                                              \
         }                                                  \
+done ## id:;                                              \
     }                                                      \
     while(false)
 
@@ -45,7 +50,7 @@ static void shellsort(void *base, size_t nmemb, size_t size,
         for(gap = (1<<12)-1; gap < nmemb; gap = ((gap+1)<<1)-1){
         }
         do{
-            SHELLSORT(base, nmemb, size, less, gap);
+            SHELLSORT(base, nmemb, size, less, gap, 1);
             gap = ((gap+1)>>1)-1;
         } while(gap > cirua_2001[cirua_2001_size-1]);
     }
@@ -54,6 +59,6 @@ static void shellsort(void *base, size_t nmemb, size_t size,
         if(gap >= nmemb){
             continue;
         }
-        SHELLSORT(base, nmemb, size, less, gap);
+        SHELLSORT(base, nmemb, size, less, gap, 2);
     }
 }
