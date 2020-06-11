@@ -9,5 +9,7 @@ shellsort_test.exe: shellsort_test.c shellsort.h
 	$(CC) $(CFLAGS) -O3 $< -o $@
 qsort_benchmark.exe: qsort_benchmark.c
 	$(CC) $(CFLAGS) -O3 $< -o $@
+std_sort_benchmark.exe: std_sort_benchmark.cpp
+	g++ -std=c++11 -Wall -Wextra -ggdb -O3 $< -o $@
 clean: 
 	rm *.exe 
