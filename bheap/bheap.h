@@ -34,6 +34,13 @@
 #error
 #endif
 
+#define BHEAP_SWAP(a, b, T) /* Swap two elements of type T */\
+    do{                                                    \
+        T tmp = a;                                         \
+        a = b;                                             \
+        b = tmp;                                           \
+    } while(false)                                         
+
 #define BHEAP_DEFINE(T)                                    \
     typedef struct bheap_ ## T{                            \
         T *arr;                                            \
@@ -68,9 +75,7 @@ static void bheap_ ## T ## _siftDown(bheap_ ## T *pq, size_t index){\
             break;                                         \
         }                                                  \
         else{                                              \
-            T tmp = (pq->arr)[index];                      \
-            (pq->arr)[index] = (pq->arr)[index_lchild];    \
-            (pq->arr)[index_lchild] = tmp;                 \
+            BHEAP_SWAP(((pq->arr)[index_lchild]), ((pq->arr)[index]), T);\
         }                                                  \
         index = index_lchild;                              \
     }                                                      \
@@ -80,11 +85,7 @@ static void bheap_ ## T ## _siftUp(bheap_ ## T *pq, size_t index){\
     /* O(log(height of index)) */                          \
     while(index != 0){                                     \
         if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){\
-            {                                              \
-                T tmp = (pq->arr)[(index-1)/2];            \
-                (pq->arr)[(index-1)/2] = (pq->arr)[index]; \
-                (pq->arr)[index] = tmp;                    \
-            }                                              \
+            BHEAP_SWAP(((pq->arr)[(index-1)/2]), ((pq->arr)[index]), T);\
             index = (index-1)/2;                           \
         }                                                  \
         else{                                              \
