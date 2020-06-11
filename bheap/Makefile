@@ -18,4 +18,4 @@ bheap_extern_demo.o : bheap_extern_demo.c bheap_extern.h
 bheap_extern_demo.exe : bheap_extern.o bheap_extern_demo.o
 	$(CC) $(CFLAGS) -O3 $^ -o $@
 clean: 
-	rm *.exe *.o
+	rm *.exe *.o bheap_extern_helper.h
