@@ -1,8 +1,7 @@
 #include <stdlib.h>
-#include "shellsort.h"
 
-bool less_int(const void *left, const void *right){
-    return *(int*)left < *(int*)right;
+int less_int(const void *left, const void *right){
+    return *(int*)left - *(int*)right;
 }
 
 int main(void){
@@ -12,6 +11,6 @@ int main(void){
     for(size_t i=0; i<arr_size; i++){
         arr[i] = rand()%1000;
     }
-    shellsort(arr, arr_size, sizeof(int), &less_int);
+    qsort(arr, arr_size, sizeof(int), &less_int);
     return 0;
 }
