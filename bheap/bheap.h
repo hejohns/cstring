@@ -99,7 +99,7 @@ static void bheap_ ## T ## _make_heap(bheap_ ## T *pq){    \
     size_t height = 0;                                     \
     for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){\
     }                                                      \
-    for(size_t i=((1<<height)-2; i > 0; i--){              \
+    for(size_t i=(1<<height)-2; i > 0; i--){              \
         bheap_ ## T ## _siftDown(pq, i);                   \
     }                                                      \
     bheap_ ## T ## _siftDown(pq, 0);                       \
