@@ -1,3 +1,7 @@
+// shellsort_vla.h
+#ifndef SHELLSORT_H
+#define SHELLSORT_H
+
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
@@ -59,3 +63,5 @@ static void shellsort(void *base, size_t nmemb, size_t size,
         SHELLSORT(base, nmemb, size, less, gap, 2);
     }
 }
+
+#endif /* SHELLSORT_H */
