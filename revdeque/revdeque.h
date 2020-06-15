@@ -26,16 +26,19 @@ class revdeque{
     };
     explicit revdeque(index_type size) 
     : size(size){
-        top.reserve(floor(sqrt(size))+1);
-        for(index_type i=0; i<floor(sqrt(size)); i++){
-            top.emplace_back((index_type)floor(sqrt(size)));
+        index_type extra = size-(index_type)(floor(sqrt(size)) * floor(sqrt(size)));
+        if(extra > 0){ //tac extras on back
+            bin_list.reserve(floor(sqrt(size))+1);
+            for(index_type i=0; i<floor(sqrt(size)); i++){
+                bin_list.emplace_back((index_type)floor(sqrt(size)));
+            }
+            bin_list.emplace_back(extra);
         }
-        if(0 < size-(index_type)( //tac extras on back
-                    floor(sqrt(size)) * floor(sqrt(size))
-                    )){
-            top.emplace_back(size-(index_type)(
-                    floor(sqrt(size)) * floor(sqrt(size))
-                    ));
+        else{ //size is pefect square
+            bin_list.reserve(sqrt(size));
+            for(index_type i=0; i<sqrt(size); i++){
+                bin_list.emplace_back((index_type)sqrt(size));
+            }
         }
     }
     template <typename InputIterator>
@@ -45,15 +48,15 @@ class revdeque{
     }
     T& operator[](index_type pos){
         index_type bin = 0;
-        while(pos >= top[bin].contents.size()){
-            pos -= top[bin].contents.size(); 
+        while(pos >= bin_list[bin].contents.size()){
+            pos -= bin_list[bin].contents.size(); 
             bin++;
         }
-        if(top[bin].reversed){
-            return *(top[bin].contents.rbegin()+pos);
+        if(bin_list[bin].reversed){
+            return *(bin_list[bin].contents.rbegin()+pos);
         }
         else{
-            return top[bin].contents[pos];
+            return bin_list[bin].contents[pos];
         }
     }
     void revert(index_type start, index_type end){ //[start, end)
@@ -62,68 +65,101 @@ class revdeque{
         coord end_c = loc(end);
         if(end_c.pos == 0){
             end_c.bin--;
-            end_c.pos = top[end_c.bin].contents.size();
+            end_c.pos = bin_list[end_c.bin].contents.size();
         }
-        if(start_c.bin < end_c.bin){
-            revert_helper(top[start_c.bin], start_c.pos, top[start_c.bin].contents.size());
+        if(start_c.bin == end_c.bin){
+            revert_helper(bin_list[start_c.bin], start_c.pos, end_c.pos);
         }
-        for(index_type i=start_c.bin+1; i < end_c.bin; i++){
-            top[i].reversed= !top[i].reversed;
+        else{
+            // mark middle bins as reversed
+            for(index_type i=start_c.bin+1; i < end_c.bin; i++){
+                bin_list[i].reversed = !bin_list[i].reversed;
+            }
+            if(bin_list[start_c.bin].contents.size()-start_c.pos < bin_list[start_c.bin].contents.size()/2
+                    && end_c.pos < bin_list[end_c.pos].contents.size()/2){
+                if(bin_list[start_c.bin].contents.size()-start_c.pos < ){
+                }
+                else{
+                }
+            }
+            else if(bin_list[start_c.bin].contents.size()-start_c.pos > bin_list[start_c.bin].contents.size()/2
+                    && end_c.pos > bin_list[end_c.pos].contents.size()/2){
+                if(start_c.pos < bin_list[end_c.pos].contents.size()-end_c.pos){
+                    std::vector<T> tmp(bin_list[start_c].contents.begin(), bin_list[start_c].contents.begin()+start_c.pos);
+                    bin_list[start_c.bin].contents.erase(bin_list[start_c.bin].contents.begin(), bin_list[start_c].contents.begin()+start_c.pos);
+                    for(index_type i=0; i < bin_list[end_c.bin].contents.size()-end_c.pos){
+                    }
+                }
+                else{
+                }
+                bin tmp = bin_list[start_c.bin];
+                bin_list[start_c.bin] = bin_list[end_c.bin];
+                bin_list[end_c.bin] = tmp;
+            }
+            else{
+            }
         }
-        if(start_c.bin < end_c.bin){
-            revert_helper(top[end_c.bin], 0, end_c.pos);
-            std::reverse(top.begin()+start_c.bin+1, top.begin()+end_c.bin);
-        }
-        revert_helper(top[end_c.bin], start_c.pos, end_c.pos);
     }
     private:
     coord loc(index_type pos){
-        coord ret = { .bin = 0, .pos = 0};
-        while(pos >= top[ret.bin].contents.size()){
-            pos -= top[ret.bin].contents.size(); 
-            ret.bin++;
+        index_type bin = 0;
+        while(pos >= bin_list[bin].contents.size()){
+            pos -= bin_list[bin].contents.size(); 
+            bin++;
         }
-        ret.pos = pos;
-        return ret;
+        return coord{.bin = bin, .pos = pos};
     }
     void revert_helper(bin& bin, index_type start_pos, index_type end_pos){
         if(end_pos-start_pos < bin.contents.size()/2){
-            std::reverse(bin.contents.begin()+start_pos, bin.contents.begin()+end_pos);
+            auto begin = (bin.reversed)? bin.contents.rbegin() : bin.contents.begin();
+            std::reverse(begin+start_pos, begin+end_pos);
         }
         else if(start_pos == 0 && end_pos == bin.contents.size()){
             bin.reversed = !bin.reversed;
         }
         else{
-            if(start_pos < bin.contents.size()-end_pos){
-                std::vector<T> tmp(bin.contents.begin(), bin.contents.begin()+start_pos);
-                bin.contents.erase(bin.contents.begin(), bin.contents.begin()+start_pos);
-                for(index_type i=0; i < bin.contents.size()-end_pos; i++){
-                    bin.contents.emplace_front(bin.contents.back());
-                    bin.contents.pop_back();
-                }
-                for(index_type i=0; i < start_pos; i++){
-                    bin.contents.emplace_back(tmp.back());
-                    tmp.pop_back();
-                }
+            if(!bin.reversed){
+                auto begin = bin.contents.begin();
+                auto end = bin.contents.end();
+#define REVDEQUE_HELPER_FB(FRONT, BACk) \
+            do{\
+                if(start_pos < bin.contents.size()-end_pos){\
+                    std::vector<T> tmp(begin, begin+start_pos);\
+                    bin.contents.erase(begin, begin+start_pos);\
+                    for(index_type i=0; i < bin.contents.size()-end_pos; i++){\
+                        bin.contents.emplace_ ## FRONT(bin.contents.BACK());\
+                        bin.contents.pop_ ## BACK();\
+                    }\
+                    for(index_type i=0; i < start_pos; i++){\
+                        bin.contents.emplace_ ## BACK(tmp.back());\
+                        tmp.pop_back();\
+                    }\
+                }\
+                else{\
+                    std::vector<T> tmp(begin+end_pos, end);\
+                    bin.contents.erase(begin+end_pos, end);\
+                    for(index_type i=0; i < start_pos; i++){\
+                        bin.contents.emplace_ ## BACK(bin.contents.FRONT());\
+                        bin.contents.pop_ ## FRONT();\
+                    }\
+                    for(index_type i=0; i < bin.contents.size()-end_pos; i++){\
+                        bin.contents.emplace_ ## FRONT(tmp.back());\
+                        tmp.pop_back();\
+                    }\
+                }\
+            } while(false)
+                REVDEQUE_HELPER_FB(front, back);
             }
             else{
-                std::vector<T> tmp(bin.contents.begin()+end_pos, bin.contents.end());
-                std::copy(bin.contents.begin()+end_pos, bin.contents.end(), tmp.begin());
-                bin.contents.erase(bin.contents.begin()+end_pos, bin.contents.end());
-                for(index_type i=0; i < start_pos; i++){
-                    bin.contents.emplace_back(bin.contents.front());
-                    bin.contents.pop_front();
-                }
-                for(index_type i=0; i < bin.contents.size()-end_pos; i++){
-                    bin.contents.emplace_front(tmp.back());
-                    tmp.pop_back();
-                }
+                auto begin = bin.contents.rbegin();
+                auto end = bin.contents.rend();
+                REVDEQUE_HELPER_FB(back, front);
             }
             bin.reversed = !bin.reversed;
         }
     }
     private:
-    std::vector<bin> top;
+    std::vector<bin> bin_list;
     index_type size;
 };
 
