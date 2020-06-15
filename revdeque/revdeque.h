@@ -14,7 +14,9 @@ class revdeque{
     public:
     struct bin{
         //bin() : reversed(false){}
-        explicit bin(index_type size) : contents{size}, reversed(false){}
+        explicit bin(index_type size) : reversed(false){
+            contents.resize(size);
+        }
         std::deque<T> contents;
         bool reversed;
     };
@@ -28,9 +30,13 @@ class revdeque{
         for(index_type i=0; i<floor(sqrt(size)); i++){
             top.emplace_back((index_type)floor(sqrt(size)));
         }
-        top.emplace_back(size-(index_type)(
+        if(0 < size-(index_type)( //tac extras on back
+                    floor(sqrt(size)) * floor(sqrt(size))
+                    )){
+            top.emplace_back(size-(index_type)(
                     floor(sqrt(size)) * floor(sqrt(size))
                     ));
+        }
     }
     template <typename InputIterator>
     explicit revdeque(InputIterator start, InputIterator end){
@@ -39,8 +45,8 @@ class revdeque{
     }
     T& operator[](index_type pos){
         index_type bin = 0;
-        while(pos >= top[bin].size()){
-            pos -= top[bin].size(); 
+        while(pos >= top[bin].contents.size()){
+            pos -= top[bin].contents.size(); 
             bin++;
         }
         if(top[bin].reversed){
@@ -56,24 +62,25 @@ class revdeque{
         coord end_c = loc(end);
         if(end_c.pos == 0){
             end_c.bin--;
-            end_c.pos = top[end_c.bin].contents.size;
+            end_c.pos = top[end_c.bin].contents.size();
         }
         if(start_c.bin < end_c.bin){
             revert_helper(top[start_c.bin], start_c.pos, top[start_c.bin].contents.size());
         }
         for(index_type i=start_c.bin+1; i < end_c.bin; i++){
-            revert_helper(top[i], 0, top[i].contents.size());
+            top[i].reversed= !top[i].reversed;
         }
-        if(true){
+        if(start_c.bin < end_c.bin){
             revert_helper(top[end_c.bin], 0, end_c.pos);
+            std::reverse(top.begin()+start_c.bin+1, top.begin()+end_c.bin);
         }
-        std::reverse(top.begin()+start_c.bin, top.begin()+end_c.bin);
+        revert_helper(top[end_c.bin], start_c.pos, end_c.pos);
     }
     private:
     coord loc(index_type pos){
         coord ret = { .bin = 0, .pos = 0};
-        while(pos >= top[bin].size()){
-            pos -= top[bin].size(); 
+        while(pos >= top[ret.bin].contents.size()){
+            pos -= top[ret.bin].contents.size(); 
             ret.bin++;
         }
         ret.pos = pos;
@@ -88,8 +95,7 @@ class revdeque{
         }
         else{
             if(start_pos < bin.contents.size()-end_pos){
-                std::vector<T> tmp((std::vector<T>::size_type)start_pos);
-                std::copy(bin.contents.begin(), bin.contents.begin()+start_pos, tmp.begin());
+                std::vector<T> tmp(bin.contents.begin(), bin.contents.begin()+start_pos);
                 bin.contents.erase(bin.contents.begin(), bin.contents.begin()+start_pos);
                 for(index_type i=0; i < bin.contents.size()-end_pos; i++){
                     bin.contents.emplace_front(bin.contents.back());
@@ -99,12 +105,11 @@ class revdeque{
                     bin.contents.emplace_back(tmp.back());
                     tmp.pop_back();
                 }
-                bin.reversed = !bin.reversed;
             }
             else{
-                std::vector<T> tmp((std::vector<T>::size_type)bin.contents.size()-end_pos);
-                std::copy(bin.contents.begin()+(end_pos-1), bin.contents.end(), tmp.begin());
-                bin.contents.erase(bin.contents.begin()+(end_pos-1), bin.contents.end());
+                std::vector<T> tmp(bin.contents.begin()+end_pos, bin.contents.end());
+                std::copy(bin.contents.begin()+end_pos, bin.contents.end(), tmp.begin());
+                bin.contents.erase(bin.contents.begin()+end_pos, bin.contents.end());
                 for(index_type i=0; i < start_pos; i++){
                     bin.contents.emplace_back(bin.contents.front());
                     bin.contents.pop_front();
@@ -113,8 +118,8 @@ class revdeque{
                     bin.contents.emplace_front(tmp.back());
                     tmp.pop_back();
                 }
-                bin.reversed = !bin.reversed;
             }
+            bin.reversed = !bin.reversed;
         }
     }
     private:
