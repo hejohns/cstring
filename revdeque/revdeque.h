@@ -68,7 +68,7 @@ class revdeque{
             end_c.pos = bin_list[end_c.bin].contents.size();
         }
         if(start_c.bin == end_c.bin){
-            revert_helper(bin_list[start_c.bin], start_c.pos, end_c.pos);
+            revert_within_single_bin(bin_list[start_c.bin], start_c.pos, end_c.pos);
         }
         else{
             // mark middle bins as reversed
@@ -77,10 +77,7 @@ class revdeque{
             }
             if(bin_list[start_c.bin].contents.size()-start_c.pos < bin_list[start_c.bin].contents.size()/2
                     && end_c.pos < bin_list[end_c.pos].contents.size()/2){
-                if(bin_list[start_c.bin].contents.size()-start_c.pos < ){
-                }
-                else{
-                }
+                revert_small_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
             }
             else if(bin_list[start_c.bin].contents.size()-start_c.pos > bin_list[start_c.bin].contents.size()/2
                     && end_c.pos > bin_list[end_c.pos].contents.size()/2){
@@ -109,8 +106,8 @@ class revdeque{
         }
         return coord{.bin = bin, .pos = pos};
     }
-    void revert_helper(bin& bin, index_type start_pos, index_type end_pos){
-        if(end_pos-start_pos < bin.contents.size()/2){
+    void revert_within_single_bin(bin& bin, index_type start_pos, index_type end_pos){
+        if(end_pos-start_pos < bin.contents.size()/2){ //range to be reversed is relatively small
             auto begin = (bin.reversed)? bin.contents.rbegin() : bin.contents.begin();
             std::reverse(begin+start_pos, begin+end_pos);
         }
@@ -121,7 +118,7 @@ class revdeque{
             if(!bin.reversed){
                 auto begin = bin.contents.begin();
                 auto end = bin.contents.end();
-#define REVDEQUE_HELPER_FB(FRONT, BACk) \
+#define REVERT_WITHIN_SINGLE_BIN_HELPER_FB(FRONT, BACk) \
             do{\
                 if(start_pos < bin.contents.size()-end_pos){\
                     std::vector<T> tmp(begin, begin+start_pos);\
@@ -130,7 +127,7 @@ class revdeque{
                         bin.contents.emplace_ ## FRONT(bin.contents.BACK());\
                         bin.contents.pop_ ## BACK();\
                     }\
-                    for(index_type i=0; i < start_pos; i++){\
+                    while(!tmp.empty()){\
                         bin.contents.emplace_ ## BACK(tmp.back());\
                         tmp.pop_back();\
                     }\
@@ -142,20 +139,108 @@ class revdeque{
                         bin.contents.emplace_ ## BACK(bin.contents.FRONT());\
                         bin.contents.pop_ ## FRONT();\
                     }\
-                    for(index_type i=0; i < bin.contents.size()-end_pos; i++){\
+                    while(!tmp.empty()){\
                         bin.contents.emplace_ ## FRONT(tmp.back());\
                         tmp.pop_back();\
                     }\
                 }\
             } while(false)
-                REVDEQUE_HELPER_FB(front, back);
+                REVERT_WITHIN_SINGLE_BIN_HELPER_FB(front, back);
             }
             else{
                 auto begin = bin.contents.rbegin();
                 auto end = bin.contents.rend();
-                REVDEQUE_HELPER_FB(back, front);
+                REVERT_WITHIN_SINGLE_BIN_HELPER_FB(back, front);
             }
             bin.reversed = !bin.reversed;
+        }
+    }
+    void revert_small_range_across_two_bins(bin& bin1, bin& bin2, index_type start_pos, index_type end_pos){
+        if(bin1.contents.size()-start_c.pos < end_c.pos){
+            if(!bin_list[start_c.bin].reversed && !bin_list[end_c.bin].reversed){
+                auto begin1 = bin_list[start_c.bin].contents.begin();
+                auto end1 = bin_list[start_c.bin].contents.end();
+                auto begin2 = bin_list[end_c.bin].contents.begin();
+                auto end2 = bin_list[end_c.bin].contents.end();
+#define REVDEQUE_REVERT_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
+            do{\
+                std::vector<T> tmp(begin1+start_c.pos, end1);\
+                bin_list[start_c.bin].contents.erase(begin1+start_c.pos, end1);\
+                for(index_type i=0; i < end_c.pos; i++){\
+                    bin_list[start_c.bin].contents.emplace_ ## BACK1(bin_list[end_c.bin].contents.FRONT2);\
+                    bin_list[end_c.bin].contents.pop_ ## FRONT2();\
+                }\
+                while(!tmp.empty()){\
+                    bin_list[end_c.bin].contents.emplace_ ## FRONT2(tmp.back());\
+                    tmp.pop_back();\
+                }\
+            } while(false)
+                REVDEQUE_REVERT_FBFB(front, back, front, back);
+            }
+            else if(!bin_list[start_c.bin].reversed && bin_list[end_c.bin].reversed){
+                auto begin1 = bin_list[start_c.bin].contents.begin();
+                auto end1 = bin_list[start_c.bin].contents.end();
+                auto begin2 = bin_list[end_c.bin].contents.rbegin();
+                auto end2 = bin_list[end_c.bin].contents.rend();
+                REVDEQUE_REVERT_FBFB(front, back, back, front);
+            }
+            else if(bin_list[start_c.bin].reversed && !bin_list[end_c.bin].reversed){
+                auto begin1 = bin_list[start_c.bin].contents.rbegin();
+                auto end1 = bin_list[start_c.bin].contents.rend();
+                auto begin2 = bin_list[end_c.bin].contents.begin();
+                auto end2 = bin_list[end_c.bin].contents.end();
+                REVDEQUE_REVERT_FBFB(back, front, front, back);
+            }
+            else{
+                auto begin1 = bin_list[start_c.bin].contents.rbegin();
+                auto end1 = bin_list[start_c.bin].contents.rend();
+                auto begin2 = bin_list[end_c.bin].contents.rbegin();
+                auto end2 = bin_list[end_c.bin].contents.rend();
+                REVDEQUE_REVERT_FBFB(back, front, back, front);
+            }
+        }
+        else{
+            if(!bin_list[start_c.bin].reversed && !bin_list[end_c.bin].reversed){
+                auto begin1 = bin_list[start_c.bin].contents.begin();
+                auto end1 = bin_list[start_c.bin].contents.end();
+                auto begin2 = bin_list[end_c.bin].contents.begin();
+                auto end2 = bin_list[end_c.bin].contents.end();
+#define REVDEQUE_REVERT_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
+            do{\
+                std::vector<T> tmp(begin2, begin2+end_c.pos);\
+                bin_list[end_c.bin].contents.erase(begin2, begin2+end_c.pos);\
+                for(index_type i=0; i < end_c.pos; i++){\
+                    bin_list[end_c.bin].contents.emplace_ ## FRONT2(bin_list[start_c.bin].contents.BACK1);\
+                    bin_list[start_c.bin].contents.pop_ ## BACK1();\
+                }\
+                while(!tmp.empty()){\
+                    bin_list[start_c.bin].contents.emplace_ ## BACK1(tmp.back());\
+                    tmp.pop_back();\
+                }\
+            } while(false)
+                REVDEQUE_REVERT_FBFB2(front, back, front, back);
+            }
+            else if(!bin_list[start_c.bin].reversed && bin_list[end_c.bin].reversed){
+                auto begin1 = bin_list[start_c.bin].contents.begin();
+                auto end1 = bin_list[start_c.bin].contents.end();
+                auto begin2 = bin_list[end_c.bin].contents.rbegin();
+                auto end2 = bin_list[end_c.bin].contents.rend();
+                REVDEQUE_REVERT_FBFB2(front, back, back, front);
+            }
+            else if(bin_list[start_c.bin].reversed && !bin_list[end_c.bin].reversed){
+                auto begin1 = bin_list[start_c.bin].contents.rbegin();
+                auto end1 = bin_list[start_c.bin].contents.rend();
+                auto begin2 = bin_list[end_c.bin].contents.begin();
+                auto end2 = bin_list[end_c.bin].contents.end();
+                REVDEQUE_REVERT_FBFB2(back, front, front, back);
+            }
+            else{
+                auto begin1 = bin_list[start_c.bin].contents.rbegin();
+                auto end1 = bin_list[start_c.bin].contents.rend();
+                auto begin2 = bin_list[end_c.bin].contents.rbegin();
+                auto end2 = bin_list[end_c.bin].contents.rend();
+                REVDEQUE_REVERT_FBFB2(back, front, back, front);
+            }
         }
     }
     private:
