@@ -81,13 +81,17 @@ class revdeque{
             }
             else if(bin_list[start_c.bin].contents.size()-start_c.pos > bin_list[start_c.bin].contents.size()/2
                     && end_c.pos > bin_list[end_c.pos].contents.size()/2){
-                revert_large_range_across_two_bins();
+                revert_large_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
+                // mark the two bins as reversed
+                bin_list[start_c.bin].reversed = !bin_list[start_c.bin].reversed;
+                bin_list[end_c.bin].reversed = !bin_list[end_c.bin].reversed;
                 // swap bins in bin_list
                 bin tmp = bin_list[start_c.bin];
                 bin_list[start_c.bin] = bin_list[end_c.bin];
                 bin_list[end_c.bin] = tmp;
             }
-            else{
+            else{ //I don't know whats a good method here
+                revert_small_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
             }
         }
     }
@@ -102,8 +106,14 @@ class revdeque{
     }
     void revert_within_single_bin(bin& bin, index_type start_pos, index_type end_pos){
         if(end_pos-start_pos < bin.contents.size()/2){ //range to be reversed is relatively small
-            auto begin = (bin.reversed)? bin.contents.rbegin() : bin.contents.begin();
-            std::reverse(begin+start_pos, begin+end_pos);
+            if(bin.reversed){
+                auto begin = bin.contents.rbegin();
+                std::reverse(begin+start_pos, begin+end_pos);
+            }
+            else{
+                auto begin = bin.contents.begin();
+                std::reverse(begin+start_pos, begin+end_pos);
+            }
         }
         else if(start_pos == 0 && end_pos == bin.contents.size()){
             bin.reversed = !bin.reversed;
@@ -112,11 +122,13 @@ class revdeque{
             if(!bin.reversed){
                 auto begin = bin.contents.begin();
                 auto end = bin.contents.end();
-#define REVERT_WITHIN_SINGLE_BIN_HELPER_FB(FRONT, BACk) \
+#define REVERT_WITHIN_SINGLE_BIN_HELPER_FB(FRONT, BACK) \
             do{\
                 if(start_pos < bin.contents.size()-end_pos){\
                     std::vector<T> tmp(begin, begin+start_pos);\
-                    bin.contents.erase(begin, begin+start_pos);\
+                    for(index_type i=0; i<start_pos; i++){\
+                        bin.contents.pop_ ## FRONT();\
+                    }\
                     for(index_type i=0; i < bin.contents.size()-end_pos; i++){\
                         bin.contents.emplace_ ## FRONT(bin.contents.BACK());\
                         bin.contents.pop_ ## BACK();\
@@ -128,7 +140,9 @@ class revdeque{
                 }\
                 else{\
                     std::vector<T> tmp(begin+end_pos, end);\
-                    bin.contents.erase(begin+end_pos, end);\
+                    for(index_type i=0; end_pos+i<bin.contents.size(); i++){\
+                        bin.contents.pop_ ## BACK();\
+                    }\
                     for(index_type i=0; i < start_pos; i++){\
                         bin.contents.emplace_ ## BACK(bin.contents.FRONT());\
                         bin.contents.pop_ ## FRONT();\
@@ -159,9 +173,11 @@ class revdeque{
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin1+start_pos, end1);\
-                bin1.contents.erase(begin1+start_pos, end1);\
+                for(index_type i=0; start_pos+i<bin1.contents.size(); i++){\
+                    bin1.contents.pop_ ## BACK1();\
+                }\
                 for(index_type i=0; i < end_pos; i++){\
-                    bin1.contents.emplace_ ## BACK1(bin2.contents.FRONT2);\
+                    bin1.contents.emplace_ ## BACK1(bin2.contents.FRONT2());\
                     bin2.contents.pop_ ## FRONT2();\
                 }\
                 while(!tmp.empty()){\
@@ -202,9 +218,11 @@ class revdeque{
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin2, begin2+end_pos);\
-                bin2.contents.erase(begin2, begin2+end_pos);\
+                for(index_type i=0; i<end_pos; i++){\
+                    bin2.contents.pop_ ## FRONT2();\
+                }\
                 for(index_type i=0; i < end_pos; i++){\
-                    bin2.contents.emplace_ ## FRONT2(bin1.contents.BACK1);\
+                    bin2.contents.emplace_ ## FRONT2(bin1.contents.BACK1());\
                     bin1.contents.pop_ ## BACK1();\
                 }\
                 while(!tmp.empty()){\
@@ -238,6 +256,96 @@ class revdeque{
         }
     }
     void revert_large_range_across_two_bins(bin& bin1, bin& bin2, index_type start_pos, index_type end_pos){
+        if(start_pos < bin2.contents.size()-end_pos){
+            if(!bin1.reversed && !bin2.reversed){
+                auto begin1 = bin1.contents.begin();
+                auto end1 = bin1.contents.end();
+                auto begin2 = bin2.contents.begin();
+                auto end2 = bin2.contents.end();
+#define REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
+            do{\
+                std::vector<T> tmp(begin1, begin1+start_pos);\
+                for(index_type i=0; i<start_pos; i++){\
+                    bin1.contents.pop_ ## FRONT1();\
+                }\
+                for(index_type i=0; i < bin2.contents.size()-end_pos; i++){\
+                    bin1.contents.emplace_ ## FRONT1(bin2.contents.BACK2());\
+                    bin2.contents.pop_ ## BACK2();\
+                }\
+                while(!tmp.empty()){\
+                    bin2.contents.emplace_ ## BACK2(tmp.back());\
+                    tmp.pop_back();\
+                }\
+            } while(false)
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(front, back, front, back);
+            }
+            else if(!bin1.reversed && bin2.reversed){
+                auto begin1 = bin1.contents.begin();
+                auto end1 = bin1.contents.end();
+                auto begin2 = bin2.contents.rbegin();
+                auto end2 = bin2.contents.rend();
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(front, back, back, front);
+            }
+            else if(bin1.reversed && !bin2.reversed){
+                auto begin1 = bin1.contents.rbegin();
+                auto end1 = bin1.contents.rend();
+                auto begin2 = bin2.contents.begin();
+                auto end2 = bin2.contents.end();
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(back, front, front, back);
+            }
+            else{
+                auto begin1 = bin1.contents.rbegin();
+                auto end1 = bin1.contents.rend();
+                auto begin2 = bin2.contents.rbegin();
+                auto end2 = bin2.contents.rend();
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(back, front, back, front);
+            }
+        }
+        else{
+            if(!bin1.reversed && !bin2.reversed){
+                auto begin1 = bin1.contents.begin();
+                auto end1 = bin1.contents.end();
+                auto begin2 = bin2.contents.begin();
+                auto end2 = bin2.contents.end();
+#define REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
+            do{\
+                std::vector<T> tmp(begin2+end_pos, end2);\
+                for(index_type i=0; end_pos+i<bin2.contents.size(); i++){\
+                    bin2.contents.pop_ ## BACK2();\
+                }\
+                for(index_type i=0; i < start_pos; i++){\
+                    bin2.contents.emplace_ ## BACK2(bin1.contents.FRONT1());\
+                    bin1.contents.pop_ ## FRONT1();\
+                }\
+                while(!tmp.empty()){\
+                    bin1.contents.emplace_ ## FRONT1(tmp.back());\
+                    tmp.pop_back();\
+                }\
+            } while(false)
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(front, back, front, back);
+            }
+            else if(!bin1.reversed && bin2.reversed){
+                auto begin1 = bin1.contents.begin();
+                auto end1 = bin1.contents.end();
+                auto begin2 = bin2.contents.rbegin();
+                auto end2 = bin2.contents.rend();
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(front, back, back, front);
+            }
+            else if(bin1.reversed && !bin2.reversed){
+                auto begin1 = bin1.contents.rbegin();
+                auto end1 = bin1.contents.rend();
+                auto begin2 = bin2.contents.begin();
+                auto end2 = bin2.contents.end();
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(back, front, front, back);
+            }
+            else{
+                auto begin1 = bin1.contents.rbegin();
+                auto end1 = bin1.contents.rend();
+                auto begin2 = bin2.contents.rbegin();
+                auto end2 = bin2.contents.rend();
+                REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(back, front, back, front);
+            }
+        }
     }
     private:
     std::vector<bin> bin_list;
