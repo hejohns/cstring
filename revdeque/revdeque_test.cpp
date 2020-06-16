@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <stdlib.h>
 #include "revdeque.h"
 
 int main(){
@@ -36,9 +37,16 @@ int main(){
     std::reverse(reference.begin()+70, reference.begin()+110);
     revdeque_inst.revert(540, 545);
     std::reverse(reference.begin()+540, reference.begin()+545);
+    revdeque_inst.revert(540, 545);
+    std::reverse(reference.begin()+540, reference.begin()+545);
+    revdeque_inst.revert(40, 545);
+    std::reverse(reference.begin()+40, reference.begin()+545);
+    revdeque_inst.revert(40, 595);
+    std::reverse(reference.begin()+40, reference.begin()+595);
     for(size_t i=0; i<sz; i++){
         if(revdeque_inst[i] != reference[i]){
             std::cout << "Failed\n";
+            exit(EXIT_FAILURE);
         }
     }
     std::cout << "Ok\n";

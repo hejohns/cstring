@@ -76,11 +76,11 @@ class revdeque{
                 bin_list[i].reversed = !bin_list[i].reversed;
             }
             if(bin_list[start_c.bin].contents.size()-start_c.pos < bin_list[start_c.bin].contents.size()/2
-                    && end_c.pos < bin_list[end_c.pos].contents.size()/2){
+                    && end_c.pos < bin_list[end_c.bin].contents.size()/2){
                 revert_small_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
             }
             else if(bin_list[start_c.bin].contents.size()-start_c.pos > bin_list[start_c.bin].contents.size()/2
-                    && end_c.pos > bin_list[end_c.pos].contents.size()/2){
+                    && end_c.pos > bin_list[end_c.bin].contents.size()/2){
                 revert_large_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
                 // mark the two bins as reversed
                 bin_list[start_c.bin].reversed = !bin_list[start_c.bin].reversed;
