@@ -33,12 +33,14 @@ class revdeque{
                 bin_list.emplace_back((index_type)floor(sqrt(size)));
             }
             bin_list.emplace_back(extra);
+            bins = floor(sqrt(size))+1;
         }
         else{ //size is pefect square
             bin_list.reserve(sqrt(size));
             for(index_type i=0; i<sqrt(size); i++){
                 bin_list.emplace_back((index_type)sqrt(size));
             }
+            bins = floor(sqrt(size));
         }
     }
     template <typename InputIterator>
@@ -60,7 +62,6 @@ class revdeque{
         }
     }
     void revert(index_type start, index_type end){ //[start, end)
-        assert(end != 0);
         coord start_c = loc(start);
         coord end_c = loc(end);
         if(end_c.pos == 0){
@@ -364,9 +365,51 @@ class revdeque{
             }
         }
     }
+    void balance(index_type bin){ //not sure how to do this yet
+        if(bin_list[bin].contents.size() > 2*floor(sqrt(size))){
+            if(bin_list[bin].contents.size() > bin_list[bin+1].contents.size()){
+                if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
+#define BALANCE_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
+                do{\
+                    index_type bin1_sz = bin_list[bin].contents.size();\
+                    for(index_type i=0; i < bin1_sz/2; i++){\
+                        bin_list[bin+1].contents.emplace_ ## FRONT2(bin_list[bin].contents.BACK1());\
+                        bin_list[bin].contents.pop_ ## BACK1();\
+                    }\
+                } while(false)
+                    BALANCE_HELPER_FBFB(front, back, front, back);
+                }
+                else if(!bin_list[bin].reversed && bin_list[bin+1].reversed){
+                    BALANCE_HELPER_FBFB(front, back, back, front);
+                }
+                else if(bin_list[bin].reversed && !bin_list[bin+1].reversed){
+                    BALANCE_HELPER_FBFB(back, front, front, back);
+                }
+                else{
+                    BALANCE_HELPER_FBFB(back, front, back, front);
+                }
+            }
+        }
+        else if(bin_list[bin].contents.size() < floor(sqrt(size))/2){
+            if(bin_list[bin].contents.size() < bin_list[bin+1].contents.size()){
+                if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
+                }
+                else if(!bin_list[bin].reversed && bin_list[bin+1].reversed){
+                }
+                else if(bin_list[bin].reversed && !bin_list[bin+1].reversed){
+                }
+                else{
+                }
+            }
+        }
+        else{
+            // do nothing
+        }
+    }
     private:
     std::vector<bin> bin_list;
     index_type size;
+    index_type bins;
 };
 
 #endif /* REVDEQUE_H */

@@ -56,6 +56,7 @@ int main(){
     for(size_t i=0; i<sz; i++){
         if(revdeque_inst[i] != reference[i]){
             std::cout << "Failed\n";
+            assert(0);
             exit(EXIT_FAILURE);
         }
     }
