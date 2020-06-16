@@ -53,6 +53,10 @@ int main(){
     std::reverse(reference.begin()+0, reference.begin()+999);
     revdeque_inst.revert(100, 199);
     std::reverse(reference.begin()+100, reference.begin()+199);
+    revdeque_inst.revert(1, 9);
+    std::reverse(reference.begin()+1, reference.begin()+9);
+    revdeque_inst.revert(1, 100);
+    std::reverse(reference.begin()+1, reference.begin()+100);
     for(size_t i=0; i<sz; i++){
         if(revdeque_inst[i] != reference[i]){
             std::cout << "Failed\n";
