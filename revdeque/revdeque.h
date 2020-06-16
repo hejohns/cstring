@@ -126,9 +126,11 @@ class revdeque{
             do{\
                 if(start_pos < bin.contents.size()-end_pos){\
                     std::vector<T> tmp(begin, begin+start_pos);\
+                    std::reverse(tmp.begin(), tmp.end());\
                     for(index_type i=0; i<start_pos; i++){\
                         bin.contents.pop_ ## FRONT();\
                     }\
+                    std::reverse(begin+end_pos, end);\
                     for(index_type i=0; i < bin.contents.size()-end_pos; i++){\
                         bin.contents.emplace_ ## FRONT(bin.contents.BACK());\
                         bin.contents.pop_ ## BACK();\
@@ -140,9 +142,12 @@ class revdeque{
                 }\
                 else{\
                     std::vector<T> tmp(begin+end_pos, end);\
-                    for(index_type i=0; end_pos+i<bin.contents.size(); i++){\
+                    std::reverse(tmp.begin(), tmp.end());\
+                    index_type bin_sz = bin.contents.size();\
+                    for(index_type i=0; i < bin_sz-end_pos; i++){\
                         bin.contents.pop_ ## BACK();\
                     }\
+                    std::reverse(begin, begin+start_pos);\
                     for(index_type i=0; i < start_pos; i++){\
                         bin.contents.emplace_ ## BACK(bin.contents.FRONT());\
                         bin.contents.pop_ ## FRONT();\
@@ -173,9 +178,12 @@ class revdeque{
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin1+start_pos, end1);\
-                for(index_type i=0; start_pos+i<bin1.contents.size(); i++){\
+                std::reverse(tmp.begin(), tmp.end());\
+                index_type bin1_sz = bin1.contents.size();\
+                for(index_type i=0; i<bin1_sz-start_pos; i++){\
                     bin1.contents.pop_ ## BACK1();\
                 }\
+                std::reverse(begin2, begin2+end_pos);\
                 for(index_type i=0; i < end_pos; i++){\
                     bin1.contents.emplace_ ## BACK1(bin2.contents.FRONT2());\
                     bin2.contents.pop_ ## FRONT2();\
@@ -218,9 +226,11 @@ class revdeque{
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin2, begin2+end_pos);\
+                std::reverse(tmp.begin(), tmp.end());\
                 for(index_type i=0; i<end_pos; i++){\
                     bin2.contents.pop_ ## FRONT2();\
                 }\
+                std::reverse(begin1+start_pos, end1);\
                 for(index_type i=0; i < end_pos; i++){\
                     bin2.contents.emplace_ ## FRONT2(bin1.contents.BACK1());\
                     bin1.contents.pop_ ## BACK1();\
@@ -310,7 +320,8 @@ class revdeque{
 #define REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin2+end_pos, end2);\
-                for(index_type i=0; end_pos+i<bin2.contents.size(); i++){\
+                index_type bin2_sz = bin2.contents.size();\
+                for(index_type i=0; i<bin2_sz-end_pos; i++){\
                     bin2.contents.pop_ ## BACK2();\
                 }\
                 for(index_type i=0; i < start_pos; i++){\
