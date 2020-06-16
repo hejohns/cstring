@@ -124,6 +124,8 @@ class revdeque{
             if(!bin.reversed){
                 auto begin = bin.contents.begin();
                 auto end = bin.contents.end();
+                (void)begin;
+                (void) end;
 #define REVERT_WITHIN_SINGLE_BIN_HELPER_FB(FRONT, BACK) \
             do{\
                 if(start_pos < bin.contents.size()-end_pos){\
@@ -166,6 +168,8 @@ class revdeque{
             else{
                 auto begin = bin.contents.rbegin();
                 auto end = bin.contents.rend();
+                (void)begin;
+                (void) end;
                 REVERT_WITHIN_SINGLE_BIN_HELPER_FB(back, front);
             }
             bin.reversed = !bin.reversed;
@@ -178,6 +182,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin1+start_pos, end1);\
@@ -203,6 +211,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(front, back, back, front);
             }
             else if(bin1.reversed && !bin2.reversed){
@@ -210,6 +222,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(back, front, front, back);
             }
             else{
@@ -217,6 +233,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(back, front, back, front);
             }
         }
@@ -226,6 +246,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin2, begin2+end_pos);\
@@ -250,6 +274,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(front, back, back, front);
             }
             else if(bin1.reversed && !bin2.reversed){
@@ -257,6 +285,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(back, front, front, back);
             }
             else{
@@ -264,6 +296,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(back, front, back, front);
             }
         }
@@ -275,6 +311,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
 #define REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin1, begin1+start_pos);\
@@ -299,6 +339,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(front, back, back, front);
             }
             else if(bin1.reversed && !bin2.reversed){
@@ -306,6 +350,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(back, front, front, back);
             }
             else{
@@ -313,6 +361,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB(back, front, back, front);
             }
         }
@@ -322,6 +374,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
 #define REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin2+end_pos, end2);\
@@ -347,6 +403,10 @@ class revdeque{
                 auto end1 = bin1.contents.end();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(front, back, back, front);
             }
             else if(bin1.reversed && !bin2.reversed){
@@ -354,6 +414,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.begin();
                 auto end2 = bin2.contents.end();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(back, front, front, back);
             }
             else{
@@ -361,6 +425,10 @@ class revdeque{
                 auto end1 = bin1.contents.rend();
                 auto begin2 = bin2.contents.rbegin();
                 auto end2 = bin2.contents.rend();
+                (void)begin1;
+                (void) end1;
+                (void)begin2;
+                (void) end2;
                 REVERT_LARGE_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(back, front, back, front);
             }
         }
