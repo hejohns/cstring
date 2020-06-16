@@ -226,12 +226,12 @@ class revdeque{
 #define REVERT_SMALL_RANGE_ACROSS_TWO_BINS_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
             do{\
                 std::vector<T> tmp(begin2, begin2+end_pos);\
-                std::reverse(tmp.begin(), tmp.end());\
                 for(index_type i=0; i<end_pos; i++){\
                     bin2.contents.pop_ ## FRONT2();\
                 }\
                 std::reverse(begin1+start_pos, end1);\
-                for(index_type i=0; i < end_pos; i++){\
+                index_type bin1_sz = bin1.contents.size();\
+                for(index_type i=0; i < bin1_sz-start_pos; i++){\
                     bin2.contents.emplace_ ## FRONT2(bin1.contents.BACK1());\
                     bin1.contents.pop_ ## BACK1();\
                 }\
