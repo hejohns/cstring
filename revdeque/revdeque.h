@@ -132,7 +132,8 @@ class revdeque{
                         bin.contents.pop_ ## FRONT();\
                     }\
                     std::reverse(begin+end_pos, end);\
-                    for(index_type i=0; i < bin.contents.size()-end_pos; i++){\
+                    index_type bin_sz = bin.contents.size();\
+                    for(index_type i=0; i < bin_sz-end_pos; i++){\
                         bin.contents.emplace_ ## FRONT(bin.contents.BACK());\
                         bin.contents.pop_ ## BACK();\
                     }\
