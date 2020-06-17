@@ -2,7 +2,9 @@ Note:
 -- O(sqrt n) reversals
 -- O(log n) lookups
 
-This is a very niche container. It only pays off if the number of reversals
+This is a very niche container. 
+It is essentially a two-level tree using a vector of deques.
+It only pays off if the number of reversals
 heavily outweighs the number of lookups. The access benchmarks that lookup time
 is roughly 100x slower than a vector, especially when iterating over the container
 since the internal representation is hardly contiguous in memory.
