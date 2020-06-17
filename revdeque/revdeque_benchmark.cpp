@@ -6,7 +6,7 @@
 #include "revdeque.h"
 
 int main(){
-    const size_t sz = 50*50;
+    const size_t sz = 100*100;
     revdeque<unsigned int, unsigned int> revdeque_inst(sz);
     for(size_t i=0; i<sz; i++){
         revdeque_inst[i] = i;
