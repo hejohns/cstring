@@ -28,7 +28,7 @@ class revdeque{
     : size(size){
         index_type extra = size-(index_type)(floor(sqrt(size)) * floor(sqrt(size)));
         if(extra > 0){ //tac extras on back
-            bin_list.reserve(floor(sqrt(size))+1);
+            bin_list.reserve((index_type)floor(sqrt(size))+1);
             for(index_type i=0; i<(index_type)floor(sqrt(size)); i++){
                 bin_list.emplace_back((index_type)floor(sqrt(size)));
             }
@@ -36,7 +36,7 @@ class revdeque{
             bins = (index_type)floor(sqrt(size))+1;
         }
         else{ //size is pefect square
-            bin_list.reserve(sqrt(size));
+            bin_list.reserve((index_type)sqrt(size));
             for(index_type i=0; i<(index_type)sqrt(size); i++){
                 bin_list.emplace_back((index_type)sqrt(size));
             }
@@ -51,7 +51,7 @@ class revdeque{
     T& operator[](index_type pos){
         index_type bin = 0;
         while(pos >= bin_list[bin].contents.size()){
-            pos -= bin_list[bin].contents.size(); 
+            pos -= (index_type)bin_list[bin].contents.size(); 
             bin++;
         }
         if(bin_list[bin].reversed){
@@ -67,7 +67,7 @@ class revdeque{
         coord end_c = loc(end);
         if(end_c.pos == 0){
             end_c.bin--;
-            end_c.pos = bin_list[end_c.bin].contents.size();
+            end_c.pos = (index_type)bin_list[end_c.bin].contents.size();
         }
         if(start_c.bin == end_c.bin){
             revert_within_single_bin(bin_list[start_c.bin], start_c.pos, end_c.pos);
@@ -112,7 +112,7 @@ class revdeque{
     coord loc(index_type pos){
         index_type bin = 0;
         while(pos >= bin_list[bin].contents.size()){
-            pos -= bin_list[bin].contents.size(); 
+            pos -= (index_type)bin_list[bin].contents.size(); 
             bin++;
         }
         return coord{bin, pos};
