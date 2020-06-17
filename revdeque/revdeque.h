@@ -102,6 +102,8 @@ class revdeque{
             else{ //I don't know whats a good method here
                 revert_small_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
             }
+            bin_list[start_c.bin].contents.shrink_to_fit();
+            bin_list[end_c.bin].contents.shrink_to_fit();
             balance(start_c.bin);
             balance(end_c.bin);
         }
