@@ -8,7 +8,7 @@ default:
 revdeque_test.exe: revdeque_test.cpp revdeque.h
 	$(CXX) $(CXXFLAGS) -O0 $< -o $@
 revdeque_benchmark.exe: revdeque_benchmark.cpp revdeque.h
-	$(CXX) $(CXXFLAGS) -DNDEBUG -O3 $< -o $@
+	$(CXX) $(CXXFLAGS) -DNDEBUG -O0 $< -o $@
 vector_benchmark.exe: vector_benchmark.cpp
 	$(CXX) $(CXXFLAGS) -DNDEBUG -O3 $< -o $@
 revdeque_access_benchmark.exe: revdeque_access_benchmark.cpp revdeque.h

@@ -55,10 +55,10 @@ class revdeque{
                 [](const bin& left, index_type value)->bool{return left.tail < value;});
         pos -= bin_it->head;
         if(bin_it->reversed){
-            return bin_it->contents[bin_it->tail-pos];
+            return *(bin_it->contents.rbegin()+pos);
         }
         else{
-            return bin_it->contents[pos];
+            return *(bin_it->contents.begin()+pos);
         }
     }
     void revert(index_type start, index_type end){ //[start, end)
