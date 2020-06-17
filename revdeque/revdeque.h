@@ -29,18 +29,18 @@ class revdeque{
         index_type extra = size-(index_type)(floor(sqrt(size)) * floor(sqrt(size)));
         if(extra > 0){ //tac extras on back
             bin_list.reserve(floor(sqrt(size))+1);
-            for(index_type i=0; i<floor(sqrt(size)); i++){
+            for(index_type i=0; i<(index_type)floor(sqrt(size)); i++){
                 bin_list.emplace_back((index_type)floor(sqrt(size)));
             }
             bin_list.emplace_back(extra);
-            bins = floor(sqrt(size))+1;
+            bins = (index_type)floor(sqrt(size))+1;
         }
         else{ //size is pefect square
             bin_list.reserve(sqrt(size));
-            for(index_type i=0; i<sqrt(size); i++){
+            for(index_type i=0; i<(index_type)sqrt(size); i++){
                 bin_list.emplace_back((index_type)sqrt(size));
             }
-            bins = floor(sqrt(size));
+            bins = (index_type)floor(sqrt(size));
         }
     }
     template <typename InputIterator>
@@ -115,7 +115,7 @@ class revdeque{
             pos -= bin_list[bin].contents.size(); 
             bin++;
         }
-        return coord{.bin = bin, .pos = pos};
+        return coord{bin, pos};
     }
     void revert_within_single_bin(bin& bin, index_type start_pos, index_type end_pos){
         if(end_pos-start_pos < bin.contents.size()/2){ //range to be reversed is relatively small
@@ -142,7 +142,7 @@ class revdeque{
                 if(start_pos < bin.contents.size()-end_pos){\
                     std::vector<T> tmp(begin, begin+start_pos);\
                     std::reverse(begin+end_pos, end);\
-                    index_type bin_sz = bin.contents.size();\
+                    index_type bin_sz = (index_type)bin.contents.size();\
                     for(index_type i=0; i<start_pos; i++){\
                         bin.contents.pop_ ## FRONT();\
                     }\
@@ -159,7 +159,7 @@ class revdeque{
                     std::vector<T> tmp(begin+end_pos, end);\
                     std::reverse(tmp.begin(), tmp.end());\
                     std::reverse(begin, begin+start_pos);\
-                    index_type bin_sz = bin.contents.size();\
+                    index_type bin_sz = (index_type)bin.contents.size();\
                     for(index_type i=0; i < bin_sz-end_pos; i++){\
                         bin.contents.pop_ ## BACK();\
                     }\
@@ -201,7 +201,7 @@ class revdeque{
                 std::vector<T> tmp(begin1+start_pos, end1);\
                 std::reverse(tmp.begin(), tmp.end());\
                 std::reverse(begin2, begin2+end_pos);\
-                index_type bin1_sz = bin1.contents.size();\
+                index_type bin1_sz = (index_type)bin1.contents.size();\
                 for(index_type i=0; i<bin1_sz-start_pos; i++){\
                     bin1.contents.pop_ ## BACK1();\
                 }\
@@ -264,7 +264,7 @@ class revdeque{
             do{\
                 std::vector<T> tmp(begin2, begin2+end_pos);\
                 std::reverse(begin1+start_pos, end1);\
-                index_type bin1_sz = bin1.contents.size();\
+                index_type bin1_sz = (index_type)bin1.contents.size();\
                 for(index_type i=0; i<end_pos; i++){\
                     bin2.contents.pop_ ## FRONT2();\
                 }\
@@ -329,7 +329,7 @@ class revdeque{
             do{\
                 std::vector<T> tmp(begin1, begin1+start_pos);\
                 std::reverse(begin2+end_pos, end2);\
-                index_type bin2_sz = bin2.contents.size();\
+                index_type bin2_sz = (index_type)bin2.contents.size();\
                 for(index_type i=0; i<start_pos; i++){\
                     bin1.contents.pop_ ## FRONT1();\
                 }\
@@ -393,7 +393,7 @@ class revdeque{
                 std::vector<T> tmp(begin2+end_pos, end2);\
                 std::reverse(tmp.begin(), tmp.end());\
                 std::reverse(begin1, begin1+start_pos);\
-                index_type bin2_sz = bin2.contents.size();\
+                index_type bin2_sz = (index_type)bin2.contents.size();\
                 for(index_type i=0; i<bin2_sz-end_pos; i++){\
                     bin2.contents.pop_ ## BACK2();\
                 }\
@@ -512,7 +512,7 @@ class revdeque{
                 if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
 #define BALANCE_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
                 do{\
-                    index_type bin_sz = bin_list[bin].contents.size();\
+                    index_type bin_sz = (index_type)bin_list[bin].contents.size();\
                     if(bin_list[bin+1].contents.size()/2 > size/bins){\
                         bin_sz = size/bins;\
                     }\
