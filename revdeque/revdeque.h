@@ -27,7 +27,10 @@ class revdeque{
     explicit revdeque(index_type size) 
     : size(size){
         index_type extra = size-(index_type)(floor(sqrt(size)) * floor(sqrt(size)));
-        if(extra > 0){ //tac extras on back bin_list.reserve(floor(sqrt(size))+1); for(index_type i=0; i<floor(sqrt(size)); i++){ bin_list.emplace_back((index_type)floor(sqrt(size)));
+        if(extra > 0){ //tac extras on back
+            bin_list.reserve(floor(sqrt(size))+1);
+            for(index_type i=0; i<floor(sqrt(size)); i++){ 
+                bin_list.emplace_back((index_type)floor(sqrt(size)));
             }
             bin_list.emplace_back(extra);
             bins = floor(sqrt(size))+1;
@@ -74,6 +77,7 @@ class revdeque{
             for(index_type i=start_c.bin+1; i < end_c.bin; i++){
                 bin_list[i].reversed = !bin_list[i].reversed;
             }
+            reverse_bin_list(start_c.bin+1, end_c.bin); //reverse middle bins in bin_list
             if(bin_list[start_c.bin].contents.size()-start_c.pos < bin_list[start_c.bin].contents.size()/2
                     && end_c.pos < bin_list[end_c.bin].contents.size()/2){
                 revert_small_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
@@ -98,7 +102,8 @@ class revdeque{
             else{ //I don't know whats a good method here
                 revert_small_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
             }
-            reverse_bin_list(start_c.bin+1, end_c.bin); //reverse middle bins in bin_list
+            balance(start_c.bin);
+            balance(end_c.bin);
         }
     }
     private:
@@ -437,13 +442,16 @@ class revdeque{
         }
     }
     void balance(index_type bin){ //not sure how to do this yet
+        if(bin+1 == bins){
+            return;
+        }
         if(bin_list[bin].contents.size() > 2*(size/bins)){
             if(bin_list[bin].contents.size() > bin_list[bin+1].contents.size()){
                 if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
 #define BALANCE_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
                 do{\
-                    index_type bin1_sz = bin_list[bin].contents.size();\
-                    for(index_type i=0; i < bin1_sz/2; i++){\
+                    index_type bin_sz = bin_list[bin].contents.size();\
+                    for(index_type i=0; i < bin_sz/2; i++){\
                         bin_list[bin+1].contents.emplace_ ## FRONT2(bin_list[bin].contents.BACK1());\
                         bin_list[bin].contents.pop_ ## BACK1();\
                     }\
@@ -464,12 +472,24 @@ class revdeque{
         else if(bin_list[bin].contents.size() < (size/bins)/2){
             if(bin_list[bin].contents.size() < bin_list[bin+1].contents.size()){
                 if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
+#define BALANCE_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
+                do{\
+                    index_type bin_sz = bin_list[bin].contents.size();\
+                    for(index_type i=0; i < bin_sz; i++){\
+                        bin_list[bin].contents.emplace_ ## BACK1(bin_list[bin+1].contents.FRONT2());\
+                        bin_list[bin+1].contents.pop_ ## FRONT2();\
+                    }\
+                } while(false)
+                    BALANCE_HELPER_FBFB2(front, back, front, back);
                 }
                 else if(!bin_list[bin].reversed && bin_list[bin+1].reversed){
+                    BALANCE_HELPER_FBFB2(front, back, back, front);
                 }
                 else if(bin_list[bin].reversed && !bin_list[bin+1].reversed){
+                    BALANCE_HELPER_FBFB2(back, front, front, back);
                 }
                 else{
+                    BALANCE_HELPER_FBFB2(back, front, back, front);
                 }
             }
         }
