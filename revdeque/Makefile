@@ -14,5 +14,6 @@ vector_benchmark.exe: vector_benchmark.cpp
 test: revdeque_benchmark.exe vector_benchmark.exe
 	time ./revdeque_benchmark.exe > delete.txt
 	time ./vector_benchmark.exe > delete2.txt
+	diff delete.txt delete2.txt
 clean: 
 	rm *.exe 
