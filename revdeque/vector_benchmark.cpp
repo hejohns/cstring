@@ -13,13 +13,13 @@ int main(){
     }
     for(unsigned int h=0; h < 1<<1; h++){
         for(unsigned int i=sz-3; i >= 2; i--){
-            for(unsigned int j=1; j+i < sz; j++){
-                std::reverse(reference.begin()+j, reference.begin()+j+i);
+            for(auto j=reference.begin()+1; j+i < reference.end(); j++){
+                std::reverse(j, j+i);
             }
         }
     }
-    for(unsigned int i=0; i<sz; i++){
-        std::cout<<reference[i]<<' ';
+    for(auto it = reference.begin(); it != reference.end(); it++){
+        std::cout<<*it<<' ';
     }
     return 0;
 }
