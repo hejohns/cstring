@@ -14,10 +14,12 @@ class revdeque{
     public:
     struct bin{
         //bin() : reversed(false){}
-        explicit bin(index_type size) : reversed(false){
+        explicit bin(index_type size, index_type head, index_type tail) : head(head), tail(tail), reversed(false){
             contents.resize(size);
         }
         std::deque<T> contents;
+        index_type head;
+        index_type tail;
         bool reversed;
     };
     struct coord{
@@ -30,15 +32,15 @@ class revdeque{
         if(extra > 0){ //tac extras on back
             bin_list.reserve((index_type)floor(sqrt(size))+1);
             for(index_type i=0; i<(index_type)floor(sqrt(size)); i++){
-                bin_list.emplace_back((index_type)floor(sqrt(size)));
+                bin_list.emplace_back((index_type)floor(sqrt(size)), (index_type)floor(sqrt(size))*i, (index_type)floor(sqrt(size))*(i+1)-1);
             }
-            bin_list.emplace_back(extra);
+            bin_list.emplace_back(extra, size-extra, size-1);
             bins = (index_type)floor(sqrt(size))+1;
         }
         else{ //size is pefect square
             bin_list.reserve((index_type)sqrt(size));
             for(index_type i=0; i<(index_type)sqrt(size); i++){
-                bin_list.emplace_back((index_type)sqrt(size));
+                bin_list.emplace_back((index_type)sqrt(size), (index_type)sqrt(size)*i, (index_type)sqrt(size)*(i+1)-1);
             }
             bins = (index_type)floor(sqrt(size));
         }
@@ -49,16 +51,14 @@ class revdeque{
         }
     }
     T& operator[](index_type pos){
-        index_type bin = 0;
-        while(pos >= bin_list[bin].contents.size()){
-            pos -= (index_type)bin_list[bin].contents.size(); 
-            bin++;
-        }
-        if(bin_list[bin].reversed){
-            return *(bin_list[bin].contents.rbegin()+pos);
+        auto bin_it = std::lower_bound(bin_list.begin(), bin_list.end(), pos,\
+                [](const bin& left, index_type value)->bool{return left.tail < value;});
+        pos -= bin_it->head;
+        if(bin_it->reversed){
+            return bin_it->contents[bin_it->tail-pos];
         }
         else{
-            return bin_list[bin].contents[pos];
+            return bin_it->contents[pos];
         }
     }
     void revert(index_type start, index_type end){ //[start, end)
@@ -106,15 +106,15 @@ class revdeque{
             bin_list[end_c.bin].contents.shrink_to_fit();
             balance(start_c.bin);
             balance(end_c.bin);
+            update_head_tail();
         }
     }
     private:
     coord loc(index_type pos){
-        index_type bin = 0;
-        while(pos >= bin_list[bin].contents.size()){
-            pos -= (index_type)bin_list[bin].contents.size(); 
-            bin++;
-        }
+        auto bin_it = std::lower_bound(bin_list.begin(), bin_list.end(), pos,\
+                [](const bin& left, index_type value)->bool{return left.tail < value;});
+        pos -= bin_it->head;
+        index_type bin = bin_it-bin_list.begin();
         return coord{bin, pos};
     }
     void revert_within_single_bin(bin& bin, index_type start_pos, index_type end_pos){
@@ -548,6 +548,14 @@ class revdeque{
             bool tmp = bin_list[bin1].reversed;
             bin_list[bin1].reversed = bin_list[bin2].reversed;
             bin_list[bin2].reversed = tmp;
+        }
+    }
+    void update_head_tail(){
+        index_type head_counter = 0;
+        for(auto& it : bin_list){
+            it.head = head_counter;
+            it.tail = head_counter+it.contents.size()-1;
+            head_counter += it.contents.size();
         }
     }
     private:
