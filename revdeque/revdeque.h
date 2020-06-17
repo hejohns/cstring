@@ -137,7 +137,6 @@ class revdeque{
             do{\
                 if(start_pos < bin.contents.size()-end_pos){\
                     std::vector<T> tmp(begin, begin+start_pos);\
-                    /*std::reverse(tmp.begin(), tmp.end());*/\
                     std::reverse(begin+end_pos, end);\
                     index_type bin_sz = bin.contents.size();\
                     for(index_type i=0; i<start_pos; i++){\
