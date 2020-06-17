@@ -114,7 +114,7 @@ class revdeque{
         auto bin_it = std::lower_bound(bin_list.begin(), bin_list.end(), pos,\
                 [](const bin& left, index_type value)->bool{return left.tail < value;});
         pos -= bin_it->head;
-        index_type bin = bin_it-bin_list.begin();
+        index_type bin = (index_type)bin_it-bin_list.begin();
         return coord{bin, pos};
     }
     void revert_within_single_bin(bin& bin, index_type start_pos, index_type end_pos){
@@ -554,8 +554,8 @@ class revdeque{
         index_type head_counter = 0;
         for(auto& it : bin_list){
             it.head = head_counter;
-            it.tail = head_counter+it.contents.size()-1;
-            head_counter += it.contents.size();
+            it.tail = head_counter+(index_type)it.contents.size()-1;
+            head_counter += (index_type)it.contents.size();
         }
     }
     private:
