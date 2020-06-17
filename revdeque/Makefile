@@ -11,7 +11,8 @@ revdeque_benchmark.exe: revdeque_benchmark.cpp revdeque.h
 	$(CXX) $(CXXFLAGS) -DNDEBUG -O3 $< -o $@
 vector_benchmark.exe: vector_benchmark.cpp
 	$(CXX) $(CXXFLAGS) -DNDEBUG -O3 $< -o $@
-test: revdeque_test.exe
-	valgrind ./revdeque_test.exe
+test: revdeque_benchmark.exe vector_benchmark.exe
+	time ./revdeque_benchmark.exe > delete.txt
+	time ./vector_benchmark.exe > delete2.txt
 clean: 
 	rm *.exe 

@@ -27,10 +27,7 @@ class revdeque{
     explicit revdeque(index_type size) 
     : size(size){
         index_type extra = size-(index_type)(floor(sqrt(size)) * floor(sqrt(size)));
-        if(extra > 0){ //tac extras on back
-            bin_list.reserve(floor(sqrt(size))+1);
-            for(index_type i=0; i<floor(sqrt(size)); i++){
-                bin_list.emplace_back((index_type)floor(sqrt(size)));
+        if(extra > 0){ //tac extras on back bin_list.reserve(floor(sqrt(size))+1); for(index_type i=0; i<floor(sqrt(size)); i++){ bin_list.emplace_back((index_type)floor(sqrt(size)));
             }
             bin_list.emplace_back(extra);
             bins = floor(sqrt(size))+1;
@@ -440,7 +437,7 @@ class revdeque{
         }
     }
     void balance(index_type bin){ //not sure how to do this yet
-        if(bin_list[bin].contents.size() > 2*floor(sqrt(size))){
+        if(bin_list[bin].contents.size() > 2*(size/bins)){
             if(bin_list[bin].contents.size() > bin_list[bin+1].contents.size()){
                 if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
 #define BALANCE_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
@@ -464,7 +461,7 @@ class revdeque{
                 }
             }
         }
-        else if(bin_list[bin].contents.size() < floor(sqrt(size))/2){
+        else if(bin_list[bin].contents.size() < (size/bins)/2){
             if(bin_list[bin].contents.size() < bin_list[bin+1].contents.size()){
                 if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
                 }
