@@ -450,8 +450,8 @@ class revdeque{
                 if(!bin_list[bin].reversed && !bin_list[bin+1].reversed){
 #define BALANCE_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
                 do{\
-                    index_type bin_sz = bin_list[bin].contents.size();\
-                    for(index_type i=0; i < bin_sz/2; i++){\
+                    /*index_type bin_sz = bin_list[bin].contents.size()*/;\
+                    for(index_type i=0; i < size/(2*bins); i++){\
                         bin_list[bin+1].contents.emplace_ ## FRONT2(bin_list[bin].contents.BACK1());\
                         bin_list[bin].contents.pop_ ## BACK1();\
                     }\
