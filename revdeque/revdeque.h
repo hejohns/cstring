@@ -82,7 +82,12 @@ class revdeque{
             }
             else if(bin_list[start_c.bin].contents.size()-start_c.pos > bin_list[start_c.bin].contents.size()/2
                     && end_c.pos > bin_list[end_c.bin].contents.size()/2){
-                revert_large_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
+                if(start_c.pos == 0 && end_c.pos == bin_list[end_c.bin].contents.size()){
+                    // do not call revert_large if bin1 and bin2 are whole reverts
+                }
+                else{
+                    revert_large_range_across_two_bins(bin_list[start_c.bin], bin_list[end_c.bin], start_c.pos, end_c.pos);
+                }
                 // mark the two bins as reversed
                 bin_list[start_c.bin].reversed = !bin_list[start_c.bin].reversed;
                 bin_list[end_c.bin].reversed = !bin_list[end_c.bin].reversed;
@@ -126,7 +131,7 @@ class revdeque{
                 auto begin = bin.contents.begin();
                 auto end = bin.contents.end();
                 (void)begin;
-                (void) end;
+                (void)end;
 #define REVERT_WITHIN_SINGLE_BIN_HELPER_FB(FRONT, BACK) \
             do{\
                 if(start_pos < bin.contents.size()-end_pos){\
@@ -170,7 +175,7 @@ class revdeque{
                 auto begin = bin.contents.rbegin();
                 auto end = bin.contents.rend();
                 (void)begin;
-                (void) end;
+                (void)end;
                 REVERT_WITHIN_SINGLE_BIN_HELPER_FB(back, front);
             }
             bin.reversed = !bin.reversed;

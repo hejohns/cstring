@@ -1,5 +1,5 @@
 CXX := clang++
-CXXFLAGS := -std=c++2a -Wall -Wextra -ggdb
+CXXFLAGS := -std=c++17 -Wall -Wextra -ggdb
 
 .PHONY: default test clean
 

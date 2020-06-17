@@ -13,10 +13,43 @@ int main(){
         revdeque_inst[i] = i;
         reference[i] = i;
     }
+    revdeque_inst.revert(1, 190);
+    std::reverse(reference.begin()+1, reference.begin()+190);
+    for(size_t i=0; i<sz; i++){
+        if(revdeque_inst[i] != reference[i]){
+            std::cout << "Failed\n";
+            assert(0);
+            exit(EXIT_FAILURE);
+        }
+    }
     revdeque_inst.revert(0, 100);
     std::reverse(reference.begin(), reference.begin()+100);
-    revdeque_inst.revert(50, 150);
-    std::reverse(reference.begin()+50, reference.begin()+150);
+    for(size_t i=0; i<sz; i++){
+        if(revdeque_inst[i] != reference[i]){
+            std::cout << "Failed\n";
+            assert(0);
+            exit(EXIT_FAILURE);
+        }
+    }
+    revdeque_inst.revert(48, 152);
+    std::reverse(reference.begin()+48, reference.begin()+152);
+    for(size_t i=0; i<sz; i++){
+        if(revdeque_inst[i] != reference[i]){
+            std::cout << "Failed\n";
+            assert(0);
+            exit(EXIT_FAILURE);
+        }
+    }
+    revdeque_inst.revert(49, 151);
+    std::reverse(reference.begin()+49, reference.begin()+151);
+    for(size_t i=0; i<sz; i++){
+        if(revdeque_inst[i] != reference[i]){
+            std::cout << "Failed\n";
+            assert(0);
+            exit(EXIT_FAILURE);
+        }
+    }
+    /*
     revdeque_inst.revert(70, 110);
     std::reverse(reference.begin()+70, reference.begin()+110);
     revdeque_inst.revert(90, 110);
@@ -57,6 +90,7 @@ int main(){
     std::reverse(reference.begin()+1, reference.begin()+9);
     revdeque_inst.revert(1, 100);
     std::reverse(reference.begin()+1, reference.begin()+100);
+    */
     for(size_t i=0; i<sz; i++){
         if(revdeque_inst[i] != reference[i]){
             std::cout << "Failed\n";
