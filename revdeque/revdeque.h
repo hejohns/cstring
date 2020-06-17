@@ -29,7 +29,7 @@ class revdeque{
         index_type extra = size-(index_type)(floor(sqrt(size)) * floor(sqrt(size)));
         if(extra > 0){ //tac extras on back
             bin_list.reserve(floor(sqrt(size))+1);
-            for(index_type i=0; i<floor(sqrt(size)); i++){ 
+            for(index_type i=0; i<floor(sqrt(size)); i++){
                 bin_list.emplace_back((index_type)floor(sqrt(size)));
             }
             bin_list.emplace_back(extra);
