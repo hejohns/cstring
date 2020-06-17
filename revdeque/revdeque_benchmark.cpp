@@ -6,7 +6,7 @@
 #include "revdeque.h"
 
 int main(){
-    const size_t sz = 16;
+    const size_t sz = 1024;
     revdeque<unsigned int, unsigned int> revdeque_inst(sz);
     for(size_t i=0; i<sz; i++){
         revdeque_inst[i] = i;
@@ -14,8 +14,7 @@ int main(){
     for(unsigned int h=0; h < 1<<1; h++){
         for(unsigned int i=sz-3; i >= 2; i--){
             for(unsigned int j=1; j+i < sz; j++){
-                std::cout:j
-                revdeque_inst.revert(j, i);
+                revdeque_inst.revert(j, j+i);
             }
         }
     }

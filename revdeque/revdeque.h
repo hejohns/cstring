@@ -62,6 +62,7 @@ class revdeque{
         }
     }
     void revert(index_type start, index_type end){ //[start, end)
+        assert(start < end); //this has been the cause of many horrors :(
         coord start_c = loc(start);
         coord end_c = loc(end);
         if(end_c.pos == 0){
