@@ -441,8 +441,44 @@ class revdeque{
             }
         }
     }
+    void balance_push_left(index_type bin){
+        if(bin == 0){
+            return;
+        }
+        if(bin_list[bin].contents.size()/2 > size/bins){
+            if(bin_list[bin-1].contents.size() < bin_list[bin].contents.size()){
+                if(!bin_list[bin-1].reversed && !bin_list[bin].reversed){
+#define BALANCE_PUSH_LEFT_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
+                do{\
+                    /*index_type bin_sz = bin_list[bin].contents.size()*/;\
+                    for(index_type i=0; i < size/bins; i++){\
+                        bin_list[bin-1].contents.emplace_ ## BACK1(bin_list[bin].contents.FRONT2());\
+                        bin_list[bin].contents.pop_ ## FRONT2();\
+                    }\
+                } while(false)
+                    BALANCE_PUSH_LEFT_HELPER_FBFB(front, back, front, back);
+                }
+                else if(!bin_list[bin-1].reversed && bin_list[bin].reversed){
+                    BALANCE_PUSH_LEFT_HELPER_FBFB(front, back, back, front);
+                }
+                else if(bin_list[bin-1].reversed && !bin_list[bin].reversed){
+                    BALANCE_PUSH_LEFT_HELPER_FBFB(back, front, front, back);
+                }
+                else{
+                    BALANCE_PUSH_LEFT_HELPER_FBFB(back, front, back, front);
+                }
+                balance_push_left(bin-1);
+            }
+        }
+    }
     void balance(index_type bin){ //not sure how to do this yet
+        /*
+         * Right now, I'm just trying to approximately equalize the "flow"
+         * pushing to the right and pulling to the left should roughly balance
+         */
         if(bin+1 == bins){
+            /* the only time we push to the left */
+            balance_push_left(bin);
             return;
         }
         if(bin_list[bin].contents.size() > 2*(size/bins)){
@@ -451,7 +487,7 @@ class revdeque{
 #define BALANCE_HELPER_FBFB(FRONT1, BACK1, FRONT2, BACK2) \
                 do{\
                     /*index_type bin_sz = bin_list[bin].contents.size()*/;\
-                    for(index_type i=0; i < size/(2*bins); i++){\
+                    for(index_type i=0; i < size/bins; i += 2){\
                         bin_list[bin+1].contents.emplace_ ## FRONT2(bin_list[bin].contents.BACK1());\
                         bin_list[bin].contents.pop_ ## BACK1();\
                     }\
@@ -475,6 +511,9 @@ class revdeque{
 #define BALANCE_HELPER_FBFB2(FRONT1, BACK1, FRONT2, BACK2) \
                 do{\
                     index_type bin_sz = bin_list[bin].contents.size();\
+                    if(bin_list[bin+1].contents.size()/2 > size/bins){\
+                        bin_sz = size/bins;\
+                    }\
                     for(index_type i=0; i < bin_sz; i++){\
                         bin_list[bin].contents.emplace_ ## BACK1(bin_list[bin+1].contents.FRONT2());\
                         bin_list[bin+1].contents.pop_ ## FRONT2();\
