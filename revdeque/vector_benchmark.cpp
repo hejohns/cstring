@@ -6,7 +6,7 @@
 #include "revdeque.h"
 
 int main(){
-    const size_t sz = 300*300;
+    const size_t sz = 100*100;
     std::vector<unsigned int> reference(sz);
     for(size_t i=0; i<sz; i++){
         reference[i] = i;
