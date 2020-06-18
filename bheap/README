@@ -1,0 +1,15 @@
+Binary heap implementaion
+
+Notes:
+-- Removed macro templating since the non-idiomaticness was getting on my nerves
+-- Note, bheap_push needs the address of the value you are trying to push
+   in order to be type agnostic. Thus, it is not possible to push temporaries.
+   You need to do something like
+   int tmp;
+   tmp = 10, bheap_push(&myBheap, &tmp);
+   tmp = 20, bheap_push(&myBheap, &tmp);
+   Instead of the usual
+   bheap_push(&myBheap, 10);
+   bheap_push(&myBheap, 20);
+
+   (Yes, I know the bheap_test.c doesn't reflect this. I wrote it when bheap.h was still macro templated)

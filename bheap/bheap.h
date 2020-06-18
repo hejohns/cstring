@@ -1,148 +1,137 @@
 // bheap.h
-/*
- * Don't include ifndef guards so that multiple bheaps of 
- * different types can be declared (just be careful). 
- */
-
-/* When using this header, put something like
- * #define BHEAP_TYPE int
- * #include "bheap.h"
- * 
- * (BHEAP_TYPE is not defined here)
- */
-/* Either mark all functions as static and only inlclude
- * this file in .c files, or mark all functions extern and
- * put all the BHEAP_TYPEs you want into a single
- * .c for all your other code to link against.
- *
- * By default, all functions will be marked static so it's 
- * more convenient when you really just use one pq anyways.
- * If you want the extern version, use
- * make bheap_extern.h
- * If I actually need it someday, I'll make a .h to correspond
- * to bheap_extern.h
- * 
- * The downside to this macro abuse is that things like
- * function call type mismatch will invoke pages of compiler 
- * errors (flashbacks to C++ templates) :(
- */
+#ifndef BHEAP_H
+#define BHEAP_H
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
-#ifndef BHEAP_TYPE
-#error
+#define BHEAP_GROWTH_FACTOR 2
+
+/* cc -DBHEAP_USE_VLA to use vla/memcpy for BHEAP_SWAP
+ * Default is as in glibc, to be safe and only use a char buffer
+ */
+#ifdef BHEAP_USE_VLA
+#define BHEAP_SWAP(a, b, size)                             \
+    do{                                                    \
+        char tmp[size];                                    \
+        memcpy(tmp, a, size);                              \
+        memcpy(a, b, size);                                \
+        memcpy(b, tmp, size);                              \
+    } while(false)
+#else
+// from glibc's qsort SWAP macro
+#define BHEAP_SWAP(a, b, size)                             \
+    do{                                                    \
+        size_t sz = size;                                  \
+        char *A = a;                                       \
+        char *B = b;                                       \
+        do{                                                \
+            char tmp = *A;                                 \
+            *A++ = *B;                                     \
+            *B++ = tmp;                                    \
+        } while(--sz > 0);                                 \
+    } while(false)
 #endif
 
-#define BHEAP_SWAP(a, b, T) /* Swap two elements of type T */\
-    do{                                                    \
-        T tmp = a;                                         \
-        a = b;                                             \
-        b = tmp;                                           \
-    } while(false)                                         
+typedef struct bheap{
+    void *arr;
+    /* const function pointer to hopefully encourage inlining */
+    bool (*const less)(const void *, const void *);
+    /* to enforce that element type should be known at compile time */
+    const size_t elt_size;
+    size_t size;
+    size_t capacity;
+} bheap;
 
-#define BHEAP_DEFINE(T)                                    \
-    typedef struct bheap_ ## T{                            \
-        T *arr;                                            \
-        /* const function pointer to hopefully encourage inlining */\
-        bool (*const less)(const T *, const T *);          \
-        size_t size;                                       \
-        size_t capacity;                                   \
-    } bheap_ ## T;                                         \
-                                                           \
-static void bheap_ ## T ## _init(bheap_ ## T *pq, size_t size){\
-    pq->arr = malloc(size*sizeof(T));                      \
-    pq->size = 0;                                          \
-    pq->capacity = size;                                   \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _free(bheap_ ## T *pq){         \
-    free(pq->arr);                                         \
-    pq->arr = NULL;                                        \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _siftDown(bheap_ ## T *pq, size_t index){\
-    /* O(log(height of tree - height of index)) */         \
-    size_t index_lchild; /* left child or lesser child */  \
-    while(2*index+1 <= pq->size-1){                        \
-        index_lchild = 2*index+1;                          \
-        if(index_lchild+1 <= pq->size-1){                  \
-            if(pq->less(pq->arr+index_lchild, pq->arr+index_lchild+1)){\
-                ++index_lchild;                            \
-            }                                              \
-        }                                                  \
-        if(pq->less(pq->arr+index_lchild, pq->arr+index)){ \
-            break;                                         \
-        }                                                  \
-        else{                                              \
-            BHEAP_SWAP(((pq->arr)[index_lchild]), ((pq->arr)[index]), T);\
-        }                                                  \
-        index = index_lchild;                              \
-    }                                                      \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _siftUp(bheap_ ## T *pq, size_t index){\
-    /* O(log(height of index)) */                          \
-    while(index != 0){                                     \
-        if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){\
-            BHEAP_SWAP(((pq->arr)[(index-1)/2]), ((pq->arr)[index]), T);\
-            index = (index-1)/2;                           \
-        }                                                  \
-        else{                                              \
-            break;                                         \
-        }                                                  \
-    }                                                      \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _make_heap(bheap_ ## T *pq){    \
-    /* Floyd's heap algorithm */                           \
-    /* O(size) */                                          \
-    if(pq->size <= 1){                                     \
-        return;                                            \
-    }                                                      \
-    size_t height = 0;                                     \
-    for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){\
-    }                                                      \
-    for(size_t i=(1<<height)-2; i > 0; i--){               \
-        bheap_ ## T ## _siftDown(pq, i);                   \
-    }                                                      \
-    bheap_ ## T ## _siftDown(pq, 0);                       \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _push(bheap_ ## T *pq, const T value){\
-    /* O(log size) */                                      \
-    if(!(pq->size < pq->capacity)){                        \
-        T* tmp = realloc(pq->arr, 2*(pq->size*sizeof(T))); \
-        if(tmp){                                           \
-            pq->arr = tmp;                                 \
-            pq->capacity *= 2;                             \
-        }                                                  \
-        else{                                              \
-            exit(EXIT_FAILURE);                            \
-        }                                                  \
-    }                                                      \
-    (pq->arr)[pq->size++] = value;                         \
-    bheap_ ## T ## _siftUp(pq, pq->size-1);                \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _push_by_ref(bheap_ ## T *pq, const T *value){\
-    bheap_ ## T ## _push(pq, *value);                      \
-}                                                          \
-                                                           \
-static void bheap_ ## T ## _pop(bheap_ ## T *pq){          \
-    /* O(log size) */                                      \
-    if(pq->size > 0){                                      \
-        (pq->arr)[0] = (pq->arr)[pq->size-1];              \
-        pq->size--;                                        \
-        bheap_ ## T ## _siftDown(pq, 0);                   \
-    }                                                      \
-    else{                                                  \
-        exit(EXIT_FAILURE);                                \
-    }                                                      \
-}                                                          \
-                                                           \
-/* BHEAP_DEFINE(T) */
+static void bheap_init(bheap *const pq, size_t size){
+    pq->arr = malloc(size*pq->elt_size);
+    pq->size = 0;
+    pq->capacity = size;
+}
 
-#define BHEAP_DEFINE_HELPER(x) BHEAP_DEFINE(x)
-BHEAP_DEFINE_HELPER(BHEAP_TYPE)
-#undef BHEAP_TYPE
+static void bheap_free(bheap *const pq){
+    free(pq->arr);
+    pq->arr = NULL;
+    pq->size = 0;
+    pq->capacity = 0;
+}
+
+static void bheap_siftDown(bheap *const pq, size_t index){
+    /* O(log(height of tree - height of index)) */
+    size_t index_lchild; /* left child or lesser child */
+    while(2*index+1 <= pq->size-1){
+        index_lchild = 2*index+1;
+        if(index_lchild+1 <= pq->size-1){
+            if(pq->less(pq->arr + index_lchild*pq->elt_size, pq->arr + (index_lchild+1)*pq->elt_size)){
+                ++index_lchild;
+            }
+        }
+        if(pq->less(pq->arr + index_lchild*pq->elt_size, pq->arr + index*pq->elt_size)){
+            break;
+        }
+        else{
+            BHEAP_SWAP((pq->arr + (index_lchild*pq->elt_size)), (pq->arr + (index*pq->elt_size)), pq->elt_size);
+        }
+        index = index_lchild;
+    }
+}
+
+static void bheap_siftUp(bheap *const pq, size_t index){
+    /* O(log(height of index)) */
+    while(index != 0){
+        if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){
+            BHEAP_SWAP((pq->arr + (((index-1)/2)*pq->elt_size)), (pq->arr + (index*pq->elt_size)), pq->elt_size);
+            index = (index-1)/2;
+        }
+        else{
+            break;
+        }
+    }
+}
+
+static void bheap_make_heap(bheap *const pq){
+    /* Floyd's heap algorithm */
+    /* O(size) */
+    if(pq->size <= 1){
+        return;
+    }
+    size_t height = 0;
+    for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){
+    }
+    for(size_t i=(1<<height)-2; i > 0; i--){
+        bheap_siftDown(pq, i);
+    }
+    bheap_siftDown(pq, 0);
+}
+
+static void bheap_push(bheap *const pq, const void *value){
+    /* O(log size) */
+    if(!(pq->size < pq->capacity)){
+        void *tmp = realloc(pq->arr, BHEAP_GROWTH_FACTOR*(pq->size*pq->elt_size));
+        if(tmp){
+            pq->arr = tmp;
+            pq->capacity *= BHEAP_GROWTH_FACTOR;
+        }
+        else{
+            exit(EXIT_FAILURE);
+        }
+    }
+    memcpy(pq->arr + (pq->size)*pq->elt_size, value, pq->elt_size);
+    pq->size++;
+    bheap_siftUp(pq, pq->size-1);
+}
+
+static void bheap_pop(bheap *const pq){
+    /* O(log size) */
+    if(pq->size > 0){
+        memcpy(pq->arr, pq->arr + (pq->size-1), pq->elt_size);
+        pq->size--;
+        bheap_siftDown(pq, 0);
+    }
+    else{
+        exit(EXIT_FAILURE);
+    }
+}
+
+#endif /* BHEAP_H */
