@@ -20,7 +20,10 @@
 
 #define SHELLSORT_CONCATONATE(a, b) a ## b
 
-/* optimize for cache by reordering loops
+/* Do a gap-insertion sort on all subsequences concurrently
+ *
+ * Gives better slightly cache locality than doing a full
+ * gap-sort on each subsequence before moving onto the next
  */
 #define SHELLSORT(base, nmemb, size, less, gap, id)        \
     do{                                                    \
@@ -51,7 +54,7 @@ static void shellsort(void *base, size_t nmemb, size_t size,
     static const size_t cirua_2001[] = {1, 4, 10, 23, 57, 132, 301, 701};
     size_t gap;
     if(nmemb >= 1<<12){
-        for(gap = (1<<12)-1; gap < nmemb; gap = ((gap+1)<<1)-1){
+        for(gap = (1<<12)-1; ((gap+1)<<1)-1 < nmemb; gap = ((gap+1)<<1)-1){
         }
         do{
             SHELLSORT(base, nmemb, size, less, gap, 1);
