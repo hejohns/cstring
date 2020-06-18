@@ -1,0 +1,10 @@
+Shellsort implementaion
+
+Notes:
+-- Intended for embedded contexts like AVR where recursion is frowned upon.
+-- By default, shellsort.h swaps elements char by char. Define SHELLSORT_USE_VLA to use a vla buffer for swaps.
+   Performance difference can be quite dramatic (shellsort_test.c runs almost 2x longer w/o vla on x86).
+-- Function signature modelled after qsort, but note, shellsort uses a C++ STL style comparator
+   bool (*const less)(const void *, const void *)
+   NOT qsort's
+   int (*compar)(const void *, const void *)
