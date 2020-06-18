@@ -61,7 +61,7 @@ done ## id:;                                               \
     while(false)
 
 // parameter names/order based of qsort, but compar is incompatible with less
-static void shellsort(void *base, size_t nmemb, size_t size,
+static void shellsort(void *const base, size_t nmemb, size_t size,
         bool (*const less)(const void *, const void *)){
     // start with cirua_2001 gap, then just use (2^k)-1 for simplicity
     static const size_t cirua_2001_size = 8;
