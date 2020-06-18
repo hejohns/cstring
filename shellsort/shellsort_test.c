@@ -1,12 +1,12 @@
 #include <stdlib.h>
-#include "shellsort_vla.h"
+#include "shellsort.h"
 
 bool less_int(const void *left, const void *right){
     return *(int*)left < *(int*)right;
 }
 
 int main(void){
-    const size_t arr_size = 1<<20;
+    const size_t arr_size = 1<<22;
     int* arr = malloc(arr_size*sizeof(int));
     srand(0);
     for(size_t i=0; i<arr_size; i++){

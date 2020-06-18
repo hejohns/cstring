@@ -7,6 +7,8 @@ default:
 	make clean
 shellsort_test.exe: shellsort_test.c shellsort.h
 	$(CC) $(CFLAGS) -O3 $< -o $@
+shellsort_vla_test.exe: shellsort_test.c shellsort.h
+	$(CC) $(CFLAGS) -DSHELLSORT_USE_VLA -O3 $< -o $@
 qsort_benchmark.exe: qsort_benchmark.c
 	$(CC) $(CFLAGS) -O3 $< -o $@
 qsort_vla_benchmark.exe: qsort_vla_benchmark.c

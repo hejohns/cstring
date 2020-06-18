@@ -5,6 +5,19 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/* cc -DSHELLSORT_USE_VLA to use vla/memcpy for SHELLSORT_SWAP
+ * Default is as in glibc, to be safe and only use a char buffer
+ */
+#ifdef SHELLSORT_USE_VLA
+#include <string.h>
+#define SHELLSORT_SWAP(a, b, size)                         \
+    do{                                                    \
+        char tmp[size];                                    \
+        memcpy(tmp, a, size);                              \
+        memcpy(a, b, size);                                \
+        memcpy(b, tmp, size);                              \
+    } while(false)
+#else
 // from glibc's qsort SWAP macro
 #define SHELLSORT_SWAP(a, b, size)                         \
     do{                                                    \
@@ -17,6 +30,7 @@
             *B++ = tmp;                                    \
         } while(--sz > 0);                                 \
     } while(false)
+#endif
 
 #define SHELLSORT_CONCATONATE(a, b) a ## b
 
