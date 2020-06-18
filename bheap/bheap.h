@@ -83,7 +83,7 @@ static void bheap_siftDown(bheap *const pq, size_t index){
 static void bheap_siftUp(bheap *const pq, size_t index){
     /* O(log(height of index)) */
     while(index != 0){
-        if(pq->less(pq->arr+((index-1)/2), pq->arr+index)){
+        if(pq->less(pq->arr+((index-1)/2)*pq->elt_size, pq->arr+index*pq->elt_size)){
             BHEAP_SWAP((pq->arr + (((index-1)/2)*pq->elt_size)), (pq->arr + (index*pq->elt_size)), pq->elt_size);
             index = (index-1)/2;
         }
@@ -136,14 +136,11 @@ static void bheap_pop(bheap *const pq){
     }
 }
 
-/* Haven't actually tested to see if it even compiles
- */
-
 static void heapsort(void *const base, size_t nmemb, size_t size,
         bool (*const less)(const void *, const void *)){
     bheap tmp = {.arr = base, .less = less, .elt_size = size, .size = nmemb};
     bheap_make_heap(&tmp);
-    for(size_t i=NMEMB-1; i > 0; i--){
+    for(size_t i=nmemb-1; i > 0; i--){
         BHEAP_SWAP((tmp.arr + (i)*tmp.elt_size), tmp.arr, tmp.elt_size);
         tmp.size--;
         bheap_siftDown(&tmp, 0);
