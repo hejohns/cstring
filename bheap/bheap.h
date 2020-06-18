@@ -136,4 +136,18 @@ static void bheap_pop(bheap *const pq){
     }
 }
 
+/* Haven't actually tested to see if it even compiles
+ */
+
+static void heapsort(void *const base, size_t nmemb, size_t size,
+        bool (*const less)(const void *, const void *)){
+    bheap tmp = {.arr = base, .less = less, .elt_size = size, .size = nmemb};
+    bheap_make_heap(&tmp);
+    for(size_t i=NMEMB-1; i > 0; i--){
+        BHEAP_SWAP((tmp.arr + (i)*tmp.elt_size), tmp.arr, tmp.elt_size);
+        tmp.size--;
+        bheap_siftDown(&tmp, 0);
+    }
+}
+
 #endif /* BHEAP_H */
