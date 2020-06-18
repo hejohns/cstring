@@ -46,6 +46,9 @@ typedef struct bheap{
 
 static void bheap_init(bheap *const pq, size_t size){
     pq->arr = malloc(size*pq->elt_size);
+    if(!pq->arr && size){ //malloc failure
+        exit(EXIT_FAILURE);
+    }
     pq->size = 0;
     pq->capacity = size;
 }
@@ -64,7 +67,7 @@ static void bheap_siftDown(bheap *const pq, size_t index){
         index_lchild = 2*index+1;
         if(index_lchild+1 <= pq->size-1){
             if(pq->less(pq->arr + index_lchild*pq->elt_size, pq->arr + (index_lchild+1)*pq->elt_size)){
-                ++index_lchild;
+                index_lchild++;
             }
         }
         if(pq->less(pq->arr + index_lchild*pq->elt_size, pq->arr + index*pq->elt_size)){
@@ -97,8 +100,7 @@ static void bheap_make_heap(bheap *const pq){
         return;
     }
     size_t height = 0;
-    for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){
-    }
+    for(size_t sz = pq->size >> 1; sz; height++, sz >>= 1){}
     for(size_t i=(1<<height)-2; i > 0; i--){
         bheap_siftDown(pq, i);
     }
@@ -114,7 +116,7 @@ static void bheap_push(bheap *const pq, const void *value){
             pq->capacity *= BHEAP_GROWTH_FACTOR;
         }
         else{
-            exit(EXIT_FAILURE);
+            exit(EXIT_FAILURE); //realloc failure
         }
     }
     memcpy(pq->arr + (pq->size)*pq->elt_size, value, pq->elt_size);
@@ -130,7 +132,7 @@ static void bheap_pop(bheap *const pq){
         bheap_siftDown(pq, 0);
     }
     else{
-        exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE); //Can't pop from an empty heap
     }
 }
 
