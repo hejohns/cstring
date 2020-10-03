@@ -2,10 +2,6 @@
 #ifndef CSTRING_H
 #define CSTRING_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -129,9 +125,5 @@ static inline void cstring_reserve(char** ptr, cstring_size_type size){
 static inline void cstring_shrink_to_fit(char** ptr){
     cstring_safe_realloc(ptr, (cstring_size_type)strlen(*ptr));
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* CSTRING_H */
